@@ -26,30 +26,30 @@ const componentA = Vue.component('componentA', {
 })
 
 const vm = new Vue({
-  template: `
-    <div>
-      <!-- props -->
-      <!-- <p>{{boolProps}}</p>
-      <component-a :show-prop="showProp"></component-a>
-      <p>{{rootProps.a}}</p>
-      <p v-if="show">{{messageA}}</p>
-      <p v-else>{{messageB}}</p>
-      <p>{{rootProps.b}}</p> -->
+  // template: `
+  //   <div>
+  //     <!-- props -->
+  //     <!-- <p>{{boolProps}}</p>
+  //     <component-a :show-prop="showProp"></component-a>
+  //     <p>{{rootProps.a}}</p>
+  //     <p v-if="show">{{messageA}}</p>
+  //     <p v-else>{{messageB}}</p>
+  //     <p>{{rootProps.b}}</p> -->
 
-      <!-- methods -->
-      <!-- <button @click="clickHandle">Click Me</button> -->
+  //     <!-- methods -->
+  //     <!-- <button @click="clickHandle">Click Me</button> -->
 
-      <!-- data -->
-      <p>{{messageA}}</p>
-      <p>{{messageB}}</p>
-      <!-- <p>{{objData.a}}</p> -->
+  //     <!-- data -->
+  //     <p>{{messageA}}</p>
+  //     <p>{{messageB}}</p>
+  //     <!-- <p>{{objData.a}}</p> -->
 
-      <!-- computed -->
-      <!-- <p>{{computedA}}</p>
-      <p>{{computedB}}</p>
-      <p>{{computedC}}</p> -->
-    </div>
-  `,
+  //     <!-- computed -->
+  //     <!-- <p>{{computedA}}</p>
+  //     <p>{{computedB}}</p>
+  //     <p>{{computedC}}</p> -->
+  //   </div>
+  // `,
 
   components: {
     componentA
@@ -104,12 +104,18 @@ const vm = new Vue({
     // }
   },
 
-  // render (createElement) {
-  //   return createElement('p', {
-  //     class: 'message'
-  //   }, this.messageA)
-  //   return createElement(componentA)
-  // },
+  render (h) {
+    return h(
+      'header',
+      { class: 'message' },
+      [
+        h('p', null, this.messageA),
+        h('p', null, this.messageB)
+      ]
+    )
+
+    // return createElement(componentA)
+  },
 
   watch: {
     messageA: [
@@ -125,7 +131,7 @@ const vm = new Vue({
 
       {
         handler: 'messageAHandle',
-        immediate: true
+        // immediate: true
       }
     ],
 
