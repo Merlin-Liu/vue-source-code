@@ -109,8 +109,15 @@ const vm = new Vue({
       'header',
       { class: 'message' },
       [
-        h('p', null, this.messageA),
-        h('p', null, this.messageB)
+        h('button',
+          {
+            on: {
+              click: this.clickHandle
+            }
+          },
+        'Chnage messageA'),
+        h('p', this.messageA),
+        h('p', this.messageB)
       ]
     )
 
@@ -118,22 +125,22 @@ const vm = new Vue({
   },
 
   watch: {
-    messageA: [
-      (newVal, oldVal) => {
-        console.log(1)
-      },
+    // messageA: [
+    //   (newVal, oldVal) => {
+    //     console.log(1)
+    //   },
 
-      (newVal, oldVal) => {
-        console.log(2)
-      },
+    //   (newVal, oldVal) => {
+    //     console.log(2)
+    //   },
 
-      'clickHandle',
+    //   'changeHandle',
 
-      {
-        handler: 'messageAHandle',
-        // immediate: true
-      }
-    ],
+    //   {
+    //     handler: 'messageAHandle',
+    //     immediate: true
+    //   }
+    // ],
 
     // 'objData.c': (newVal, oldVal) => {
     //   console.log(newVal)
@@ -142,7 +149,11 @@ const vm = new Vue({
 
   methods: {
     clickHandle() {
-      console.log('clickHandle')
+      this.messageA = this.messageA + 'A'
+    },
+
+    changeHandle(newVal, oldVal) {
+      console.log(messageAHandle)
     },
 
     messageAHandle(newVal, oldVal) {
