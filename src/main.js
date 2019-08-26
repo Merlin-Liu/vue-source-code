@@ -166,7 +166,8 @@ const vm = new Vue({
       })
     }
   }
-}).$mount('#app')
+})
+// .$mount('#app')
 
 window.vm = vm
 window.componentA = vm.$children[0]

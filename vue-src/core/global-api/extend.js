@@ -16,6 +16,7 @@ export function initExtend (Vue: GlobalAPI) {
   /**
    * Class inheritance
    */
+  // 构造一个Vue的子类
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
     const Super = this
@@ -33,13 +34,11 @@ export function initExtend (Vue: GlobalAPI) {
     const Sub = function VueComponent (options) {
       this._init(options)
     }
+    // 经典的原型继承
     Sub.prototype = Object.create(Super.prototype)
     Sub.prototype.constructor = Sub
     Sub.cid = cid++
-    Sub.options = mergeOptions(
-      Super.options,
-      extendOptions
-    )
+    Sub.options = mergeOptions(Super.options, extendOptions)
     Sub['super'] = Super
 
     // For props and computed properties, we define the proxy getters on
@@ -74,7 +73,7 @@ export function initExtend (Vue: GlobalAPI) {
     Sub.extendOptions = extendOptions
     Sub.sealedOptions = extend({}, Sub.options)
 
-    // cache constructor
+    // 缓存构造函数Sub，避免多次执行Vue.extend的时候对一个子组件重复构造
     cachedCtors[SuperId] = Sub
     return Sub
   }

@@ -98,6 +98,10 @@ const componentVNodeHooks = {
 
 const hooksToMerge = Object.keys(componentVNodeHooks)
 
+// 整个createComponent分成三个阶段
+// 1、构造子类构造函数
+// 2、安装组件hooks钩子函数
+// 3、实例化vnode
 export function createComponent (
   Ctor: Class<Component> | Function | Object | void,
   data: ?VNodeData,
@@ -109,6 +113,16 @@ export function createComponent (
     return
   }
 
+  // src/core/global-api/index.js
+  // initGlobalAPI
+  // Vue.options._base = Vue
+  // 所以context.$options._base = Vue.options._base = Vue
+  // context.$options = Vue.options是因为在src/core/instance/init.js的Vue 原型上的 _init 函数中有这么一段逻辑
+  // vm.$options = mergeOptions(
+  //   resolveConstructorOptions(vm.constructor),
+  //   options || {},
+  //   vm
+  // )
   const baseCtor = context.$options._base
 
   // plain options object: turn it into a constructor
