@@ -73,8 +73,8 @@ const vm = new Vue({
   },
 
   data: {
-    messageA: 'hello A',
-    messageB: 'hello B',
+    // messageA: 'hello A',
+    // messageB: 'hello B',
     // objData: {
     //   a: 1,
     //   b: 2
@@ -105,23 +105,23 @@ const vm = new Vue({
   },
 
   render (h) {
-    return h(
-      'header',
-      { class: 'message' },
-      [
-        h('button',
-          {
-            on: {
-              click: this.clickHandle
-            }
-          },
-        'Chnage messageA'),
-        h('p', this.messageA),
-        h('p', this.messageB)
-      ]
-    )
+    // return h(
+    //   'header',
+    //   { class: 'message' },
+    //   [
+    //     h('button',
+    //       {
+    //         on: {
+    //           click: this.clickHandle
+    //         }
+    //       },
+    //     'Chnage messageA'),
+    //     h('p', this.messageA),
+    //     h('p', this.messageB)
+    //   ]
+    // )
 
-    // return createElement(componentA)
+    return h(componentA)
   },
 
   watch: {
@@ -166,8 +166,7 @@ const vm = new Vue({
       })
     }
   }
-})
-// .$mount('#app')
+}).$mount('#app')
 
 window.vm = vm
 window.componentA = vm.$children[0]
