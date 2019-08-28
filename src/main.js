@@ -1,18 +1,29 @@
 import Vue from 'vue'
 
-const componentA = Vue.component('componentA', {
-  name: 'componentA',
-  template: `
-    <div>
-      <p>componentName: componentA</p>
-      <!-- <p>componentPropsA.a: {{componentPropsA.a}}</p>
-      <p>componentPropsA.b: {{componentPropsA.b}}</p> -->
-      <p>showProp: {{showProp}}</p>
-    </div>
-  `,
+// const componentA = Vue.component('componentA', {
+//   name: 'componentA',
+//   template: `<div><p>componentName: componentA</p><!-- <p>componentPropsA.a: {{componentPropsA.a}}</p><p>componentPropsA.b: {{componentPropsA.b}}</p> --><p>showProp: {{showProp}}</p></div>`,
+
+//   props: {
+//     componentPropsA: {
+//       type: Object,
+//       default: () => ({
+//         a: 'a',
+//         b: 'b'
+//       })
+//     },
+//     showProp: {
+//       type: Boolean
+//     }
+//   }
+// })
+
+const componentB = {
+  name: 'componentB',
+  template: `<div><p>componentName: componentB</p><!-- <p>componentPropsB.a: {{componentPropsB.a}}</p><p>componentPropsB.b: {{componentPropsB.b}}</p> --><p>showProp: {{showProp}}</p></div>`,
 
   props: {
-    componentPropsA: {
+    componentPropsB: {
       type: Object,
       default: () => ({
         a: 'a',
@@ -23,7 +34,7 @@ const componentA = Vue.component('componentA', {
       type: Boolean
     }
   }
-})
+}
 
 const vm = new Vue({
   // template: `
@@ -52,7 +63,7 @@ const vm = new Vue({
   // `,
 
   components: {
-    componentA
+    // componentB
   },
 
   props: {
@@ -121,7 +132,7 @@ const vm = new Vue({
     //   ]
     // )
 
-    return h(componentA)
+    return h('div', [h(componentB)])
   },
 
   watch: {
