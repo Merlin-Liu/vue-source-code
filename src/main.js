@@ -36,6 +36,14 @@ const componentB = {
   }
 }
 
+const componentC = {
+  name: 'componentC',
+
+  render(h) {
+    return h('span', 'this is componentC')
+  }
+}
+
 const vm = new Vue({
   // template: `
   //   <div>
@@ -132,7 +140,7 @@ const vm = new Vue({
     //   ]
     // )
 
-    return h('div', [h(componentB)])
+    return h('div', [h(componentC)])
   },
 
   watch: {
