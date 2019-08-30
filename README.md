@@ -1,6 +1,6 @@
 # vue源代码解析
 
-console打在[vue.esm.js](./node_modules/vue/dist/vue.esm.js)中，如下效果
+log打在[vue.esm.js](./node_modules/vue/dist/vue.esm.js)中，如下效果
 
 ![](./static/console.png)
 
