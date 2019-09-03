@@ -172,7 +172,7 @@ const vm = new Vue({
     },
 
     changeHandle(newVal, oldVal) {
-      console.log(messageAHandle)
+      console.log('messageAHandle')
     },
 
     messageAHandle(newVal, oldVal) {
@@ -185,7 +185,8 @@ const vm = new Vue({
       })
     }
   }
-}).$mount('#app')
+})
+.$mount('#app')
 
 window.vm = vm
 window.componentA = vm.$children[0]
