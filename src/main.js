@@ -70,11 +70,11 @@ const vm = new Vue({
   //   </div>
   // `,
 
-  components: {
-    // componentB
-  },
+  // components: {
+  //   componentB
+  // },
 
-  props: {
+  // props: {
     // rootProps: {
     //   type: Object,
     //   required: false,
@@ -89,9 +89,9 @@ const vm = new Vue({
     //   type: Boolean,
     //   default: false
     // }
-  },
+  // },
 
-  data: {
+  // data: {
     // messageA: 'hello A',
     // messageB: 'hello B',
     // objData: {
@@ -107,9 +107,14 @@ const vm = new Vue({
     // }
     // $a: 1,
     // _a: 2
+  // },
+  filters: {
+    filterA(val) {
+      return 'filters: ' + val
+    }
   },
 
-  computed: {
+  // computed: {
     // computedA() {
     //   return 'computedA: ' + this.messageA
     // },
@@ -121,7 +126,7 @@ const vm = new Vue({
     // computedC() {
     //   return 'computedC: ' + this.messageA
     // }
-  },
+  // },
 
   render (h) {
     // return h(
@@ -143,7 +148,7 @@ const vm = new Vue({
     return h('div', [h(componentC)])
   },
 
-  watch: {
+  // watch: {
     // messageA: [
     //   (newVal, oldVal) => {
     //     console.log(1)
@@ -164,27 +169,27 @@ const vm = new Vue({
     // 'objData.c': (newVal, oldVal) => {
     //   console.log(newVal)
     // }
-  },
+  // },
 
-  methods: {
-    clickHandle() {
-      this.messageA = this.messageA + 'A'
-    },
+  // methods: {
+  //   clickHandle() {
+  //     this.messageA = this.messageA + 'A'
+  //   },
 
-    changeHandle(newVal, oldVal) {
-      console.log('messageAHandle')
-    },
+  //   changeHandle(newVal, oldVal) {
+  //     console.log('messageAHandle')
+  //   },
 
-    messageAHandle(newVal, oldVal) {
-      console.log('messageAHandle')
-    },
+  //   messageAHandle(newVal, oldVal) {
+  //     console.log('messageAHandle')
+  //   },
 
-    watchMessageB() {
-      this.bWatcher = this.$watch('messageB', function() {
-        console.log('b change')
-      })
-    }
-  }
+  //   watchMessageB() {
+  //     this.bWatcher = this.$watch('messageB', function() {
+  //       console.log('b change')
+  //     })
+  //   }
+  // }
 })
 .$mount('#app')
 
