@@ -70,9 +70,11 @@ const vm = new Vue({
   //   </div>
   // `,
 
-  // components: {
-  //   componentB
-  // },
+  template: `<component-c></component-c>`,
+
+  components: {
+    componentC
+  },
 
   // props: {
     // rootProps: {
@@ -128,7 +130,7 @@ const vm = new Vue({
     // }
   // },
 
-  render (h) {
+  // render (h) {
     // return h(
     //   'header',
     //   { class: 'message' },
@@ -145,8 +147,8 @@ const vm = new Vue({
     //   ]
     // )
 
-    return h('div', [h(componentC)])
-  },
+  //   return h('div', [h(componentC)])
+  // },
 
   // watch: {
     // messageA: [
