@@ -70,11 +70,14 @@ const vm = new Vue({
   //   </div>
   // `,
 
-  template: `<component-c></component-c>`,
+  template: `<div>
+    <!-- this is a comment -->
+    <p>1121</p>
+  </div>`,
 
-  components: {
-    componentC
-  },
+  // components: {
+  //   componentC
+  // },
 
   // props: {
     // rootProps: {
@@ -110,11 +113,12 @@ const vm = new Vue({
     // $a: 1,
     // _a: 2
   // },
-  filters: {
-    filterA(val) {
-      return 'filters: ' + val
-    }
-  },
+
+  // filters: {
+  //   filterA(val) {
+  //     return 'filters: ' + val
+  //   }
+  // },
 
   // computed: {
     // computedA() {
@@ -196,4 +200,4 @@ const vm = new Vue({
 .$mount('#app')
 
 window.vm = vm
-window.componentA = vm.$children[0]
+// window.componentA = vm.$children[0]
