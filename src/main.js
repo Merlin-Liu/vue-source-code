@@ -70,10 +70,15 @@ const vm = new Vue({
   //   </div>
   // `,
 
-  template: `<div>
-    <!-- this is a comment -->
-    <p>1121</p>
-  </div>`,
+  // template: `<div>
+  //   <!-- this is a comment -->
+  //   <p>1121</p>
+  //   <!--[if !IE]>-->
+  //   <link href="non-ie.css" rel="stylesheet"></link>
+  //   <!--<![endif]-->
+  // </div>`,
+
+  template: `<p class="p" id="btn">this is a 'p' tag</p>`
 
   // components: {
   //   componentC
