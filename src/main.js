@@ -78,7 +78,7 @@ const vm = new Vue({
   //   <!--<![endif]-->
   // </div>`,
 
-  template: `<p class="p" id="btn">this is a 'p' tag</p>`
+  template: `<p class="p" id="btn" v-if="a">this is a 'p' tag</p>`
 
   // components: {
   //   componentC
