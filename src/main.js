@@ -78,7 +78,7 @@ const vm = new Vue({
   //   <!--<![endif]-->
   // </div>`,
 
-  template: `<p class="p" id="btn" v-if="a">this is a 'p' tag</p>`
+  template: `<p class="p" id="btn" @click="clickHandle">this is a 'p' tag</p>`,
 
   // components: {
   //   componentC
@@ -182,25 +182,26 @@ const vm = new Vue({
     // }
   // },
 
-  // methods: {
-  //   clickHandle() {
-  //     this.messageA = this.messageA + 'A'
-  //   },
+  methods: {
+    clickHandle() {
+      // this.messageA = this.messageA + 'A'
+      alert(1111)
+    },
 
-  //   changeHandle(newVal, oldVal) {
-  //     console.log('messageAHandle')
-  //   },
+    // changeHandle(newVal, oldVal) {
+    //   console.log('messageAHandle')
+    // },
 
-  //   messageAHandle(newVal, oldVal) {
-  //     console.log('messageAHandle')
-  //   },
+    // messageAHandle(newVal, oldVal) {
+    //   console.log('messageAHandle')
+    // },
 
-  //   watchMessageB() {
-  //     this.bWatcher = this.$watch('messageB', function() {
-  //       console.log('b change')
-  //     })
-  //   }
-  // }
+    // watchMessageB() {
+    //   this.bWatcher = this.$watch('messageB', function() {
+    //     console.log('b change')
+    //   })
+    // }
+  }
 })
 .$mount('#app')
 
