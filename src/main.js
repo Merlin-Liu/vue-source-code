@@ -78,7 +78,7 @@ const vm = new Vue({
   //   <!--<![endif]-->
   // </div>`,
 
-  template: `<p class="p" id="btn" @click="clickHandle">this is a 'p' tag</p>`,
+  template: `<p class="p" id="btn" @click="clickHandle">{{messageA}}</p>`,
 
   // components: {
   //   componentC
@@ -101,23 +101,23 @@ const vm = new Vue({
     // }
   // },
 
-  // data: {
-    // messageA: 'hello A',
+  data: {
+    messageA: 'hello A',
     // messageB: 'hello B',
     // objData: {
     //   a: 1,
     //   b: 2
-    // }
+    // },
     // show: true,
 
     // showProp: 'show-prop',
     // componentProps: {
     //   a: 1,
     //   b: 2
-    // }
+    // },
     // $a: 1,
     // _a: 2
-  // },
+  },
 
   // filters: {
   //   filterA(val) {
