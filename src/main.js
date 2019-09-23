@@ -1,5 +1,9 @@
 import Vue from 'vue'
 
+const handleClick = function () {
+  alert('click')
+}
+
 // const componentA = Vue.component('componentA', {
 //   name: 'componentA',
 //   template: `<div><p>componentName: componentA</p><!-- <p>componentPropsA.a: {{componentPropsA.a}}</p><p>componentPropsA.b: {{componentPropsA.b}}</p> --><p>showProp: {{showProp}}</p></div>`,
@@ -40,7 +44,33 @@ const componentC = {
   name: 'componentC',
 
   render(h) {
-    return h('span', 'this is componentC')
+    return h('p', 'this is componentC')
+  }
+}
+
+const componentD = {
+  name: 'componentD',
+
+  render(h) {
+    return h('p', {
+      on: { click: handleClick }
+    }, 'this is componentD')
+  }
+}
+
+const componentE = {
+  name: 'componentE',
+
+  render(h) {
+    return h('p', {
+      on: { click: this.emitEvent }
+    }, 'this is componentE')
+  },
+
+  methods: {
+    emitEvent() {
+      this.$emit('customEvent')
+    }
   }
 }
 
@@ -78,13 +108,19 @@ const vm = new Vue({
   //   <!--<![endif]-->
   // </div>`,
 
-  template: `<p class="p" id="btn" @click="clickHandle">{{messageA}}</p>`,
+  template: `
+  <div>
+    <p id="btn" @click="clickHandle">{{messageA}}</p>
+    <component-d></component-d>
+    <component-e @customEvent="onCustomEvent"></component-e>
+  </div>`,
 
-  // components: {
-  //   componentC
-  // },
+  components: {
+    componentD,
+    componentE
+  },
 
-  // props: {
+  props: {
     // rootProps: {
     //   type: Object,
     //   required: false,
@@ -99,7 +135,7 @@ const vm = new Vue({
     //   type: Boolean,
     //   default: false
     // }
-  // },
+  },
 
   data: {
     messageA: 'hello A',
@@ -119,13 +155,13 @@ const vm = new Vue({
     // _a: 2
   },
 
-  // filters: {
+  filters: {
   //   filterA(val) {
   //     return 'filters: ' + val
   //   }
-  // },
+  },
 
-  // computed: {
+  computed: {
     // computedA() {
     //   return 'computedA: ' + this.messageA
     // },
@@ -137,7 +173,7 @@ const vm = new Vue({
     // computedC() {
     //   return 'computedC: ' + this.messageA
     // }
-  // },
+  },
 
   // render (h) {
     // return h(
@@ -187,6 +223,10 @@ const vm = new Vue({
       // this.messageA = this.messageA + 'A'
       alert(1111)
     },
+
+    onCustomEvent() {
+      alert('customEvent')
+    }
 
     // changeHandle(newVal, oldVal) {
     //   console.log('messageAHandle')
