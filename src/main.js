@@ -58,7 +58,7 @@ const componentD = {
   }
 }
 
-const componentE = {
+const componentE = Vue.component('componentE', {
   name: 'componentE',
 
   render(h) {
@@ -72,7 +72,7 @@ const componentE = {
       this.$emit('customEvent')
     }
   }
-}
+})
 
 const vm = new Vue({
   // template: `
@@ -110,14 +110,12 @@ const vm = new Vue({
 
   template: `
   <div>
-    <p id="btn" @click="clickHandle">{{messageA}}</p>
-    <component-d></component-d>
-    <component-e @customEvent="onCustomEvent"></component-e>
+    <p id="btn" @click="clickHandle">{{messageA}}</p><component-d></component-d><component-e @customEvent="onCustomEvent"></component-e>
   </div>`,
 
   components: {
     componentD,
-    componentE
+    // componentE
   },
 
   props: {
@@ -247,4 +245,5 @@ const vm = new Vue({
 
 window.Vue = Vue
 window.vm = vm
+window.componentE = componentE
 // window.componentA = vm.$children[0]
