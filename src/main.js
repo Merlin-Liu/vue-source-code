@@ -92,12 +92,31 @@ const componentSlot = {
   template: `<div><slot></slot><slot name="slotA"></slot><slot name="slotB"></slot></div>`
 }
 
+const componentSlotScope = {
+  name: 'componentSlotScope',
+
+  template:
+    '<div style="color: red;">' +
+      '<slot text="i am text" :msg="msg"></slot>' +
+      `<button @click="msg += 'g'">Change Msg</button>` +
+    '</div>',
+
+  data () {
+    return {
+      msg: 'i am msg'
+    }
+  }
+}
+
 const rootVm = new Vue({
   components: {
-    componentSlot
+    componentSlotScope
   },
 
-  template: `<component-slot><p>i am slot default</p><p slot="slotA">i am slot A</p><p slot="slotB">i am slot B</p></component-slot>`,
+  template:
+    '<component-slot-scope>' +
+      `<template slot-scope="slotData"><p>{{slotData.text}}</p><p>{{slotData.msg}}</p></template>` +
+    '</component-slot-scope>',
 
   props: {
   },
