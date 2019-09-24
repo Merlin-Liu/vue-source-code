@@ -4,24 +4,6 @@ const handleClick = function () {
   alert('click')
 }
 
-// const componentA = Vue.component('componentA', {
-//   name: 'componentA',
-//   template: `<div><p>componentName: componentA</p><!-- <p>componentPropsA.a: {{componentPropsA.a}}</p><p>componentPropsA.b: {{componentPropsA.b}}</p> --><p>showProp: {{showProp}}</p></div>`,
-
-//   props: {
-//     componentPropsA: {
-//       type: Object,
-//       default: () => ({
-//         a: 'a',
-//         b: 'b'
-//       })
-//     },
-//     showProp: {
-//       type: Boolean
-//     }
-//   }
-// })
-
 const componentB = {
   name: 'componentB',
   template: `<div><p>componentName: componentB</p><!-- <p>componentPropsB.a: {{componentPropsB.a}}</p><p>componentPropsB.b: {{componentPropsB.b}}</p> --><p>showProp: {{showProp}}</p></div>`,
@@ -75,47 +57,8 @@ const componentE = Vue.component('componentE', {
 })
 
 const vm = new Vue({
-  // template: `
-  //   <div>
-  //     <!-- props -->
-  //     <!-- <p>{{boolProps}}</p>
-  //     <component-a :show-prop="showProp"></component-a>
-  //     <p>{{rootProps.a}}</p>
-  //     <p v-if="show">{{messageA}}</p>
-  //     <p v-else>{{messageB}}</p>
-  //     <p>{{rootProps.b}}</p> -->
-
-  //     <!-- methods -->
-  //     <!-- <button @click="clickHandle">Click Me</button> -->
-
-  //     <!-- data -->
-  //     <p>{{messageA}}</p>
-  //     <p>{{messageB}}</p>
-  //     <!-- <p>{{objData.a}}</p> -->
-
-  //     <!-- computed -->
-  //     <!-- <p>{{computedA}}</p>
-  //     <p>{{computedB}}</p>
-  //     <p>{{computedC}}</p> -->
-  //   </div>
-  // `,
-
-  // template: `<div>
-  //   <!-- this is a comment -->
-  //   <p>1121</p>
-  //   <!--[if !IE]>-->
-  //   <link href="non-ie.css" rel="stylesheet"></link>
-  //   <!--<![endif]-->
-  // </div>`,
-
-  template: `
-  <div>
-    <p id="btn" @click="clickHandle">{{messageA}}</p><component-d></component-d><component-e @customEvent="onCustomEvent"></component-e>
-  </div>`,
-
   components: {
     componentD,
-    // componentE
   },
 
   props: {
@@ -173,72 +116,35 @@ const vm = new Vue({
     // }
   },
 
-  // render (h) {
-    // return h(
-    //   'header',
-    //   { class: 'message' },
-    //   [
-    //     h('button',
-    //       {
-    //         on: {
-    //           click: this.clickHandle
-    //         }
-    //       },
-    //     'Chnage messageA'),
-    //     h('p', this.messageA),
-    //     h('p', this.messageB)
-    //   ]
-    // )
+  render (createElement) {
+    return createElement('div', [
+      createElement('p', {
+        id: 'btn',
+        on: { click: this.clickHandle }
+      }),
 
-  //   return h('div', [h(componentC)])
-  // },
+      createElement('component-d'),
 
-  // watch: {
-    // messageA: [
-    //   (newVal, oldVal) => {
-    //     console.log(1)
-    //   },
+      createElement('component-e', {
+        on: {
+          customEvent: [this.onCustomEvent, handleClick],
+          input: this.onCustomEvent
+        }
+      })
+    ])
+  },
 
-    //   (newVal, oldVal) => {
-    //     console.log(2)
-    //   },
-
-    //   'changeHandle',
-
-    //   {
-    //     handler: 'messageAHandle',
-    //     immediate: true
-    //   }
-    // ],
-
-    // 'objData.c': (newVal, oldVal) => {
-    //   console.log(newVal)
-    // }
-  // },
+  watch: {
+  },
 
   methods: {
     clickHandle() {
-      // this.messageA = this.messageA + 'A'
       alert(1111)
     },
 
     onCustomEvent() {
       alert('customEvent')
     }
-
-    // changeHandle(newVal, oldVal) {
-    //   console.log('messageAHandle')
-    // },
-
-    // messageAHandle(newVal, oldVal) {
-    //   console.log('messageAHandle')
-    // },
-
-    // watchMessageB() {
-    //   this.bWatcher = this.$watch('messageB', function() {
-    //     console.log('b change')
-    //   })
-    // }
   }
 })
 .$mount('#app')
@@ -246,4 +152,3 @@ const vm = new Vue({
 window.Vue = Vue
 window.vm = vm
 window.componentE = componentE
-// window.componentA = vm.$children[0]
