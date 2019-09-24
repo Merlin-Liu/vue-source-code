@@ -40,7 +40,7 @@ const componentD = {
   }
 }
 
-const componentE = Vue.component('componentE', {
+const componentE = {
   name: 'componentE',
 
   render(h) {
@@ -54,101 +54,57 @@ const componentE = Vue.component('componentE', {
       this.$emit('customEvent')
     }
   }
-})
+}
 
-const vm = new Vue({
+const rootVm = new Vue({
   components: {
-    componentD,
   },
 
   props: {
-    // rootProps: {
-    //   type: Object,
-    //   required: false,
-    //   default() {
-    //     return {
-    //       a: 1,
-    //       b: 2
-    //     }
-    //   }
-    // },
-    // boolProps: {
-    //   type: Boolean,
-    //   default: false
-    // }
   },
 
   data: {
-    messageA: 'hello A',
-    // messageB: 'hello B',
-    // objData: {
-    //   a: 1,
-    //   b: 2
-    // },
-    // show: true,
-
-    // showProp: 'show-prop',
-    // componentProps: {
-    //   a: 1,
-    //   b: 2
-    // },
-    // $a: 1,
-    // _a: 2
+    inputVal: 'tsfdf'
   },
 
   filters: {
-  //   filterA(val) {
-  //     return 'filters: ' + val
-  //   }
   },
 
   computed: {
-    // computedA() {
-    //   return 'computedA: ' + this.messageA
-    // },
-
-    // computedB() {
-    //   return 'computedB: ' + this.messageA
-    // },
-
-    // computedC() {
-    //   return 'computedC: ' + this.messageA
-    // }
   },
 
   render (createElement) {
-    return createElement('div', [
-      createElement('p', {
-        id: 'btn',
-        on: { click: this.clickHandle }
-      }),
+    const input = createElement(
+      'input',
+      {
+        // 使用domProps属性来绑定input原生value
+        domProps:{
+          value: this.inputVal
+        },
 
-      createElement('component-d'),
-
-      createElement('component-e', {
         on: {
-          customEvent: [this.onCustomEvent, handleClick],
-          input: this.onCustomEvent
+          // v-model
+          input: ({target: {value}}) => {
+            this.inputVal = value
+          }
         }
-      })
-    ])
+      }
+    )
+
+    const p = createElement('p', this.inputVal)
+
+    return createElement('div', [input, p])
   },
 
   watch: {
   },
 
   methods: {
-    clickHandle() {
-      alert(1111)
-    },
-
-    onCustomEvent() {
-      alert('customEvent')
-    }
   }
 })
-.$mount('#app')
+
+// 挂载
+rootVm.$mount('#app')
 
 window.Vue = Vue
-window.vm = vm
-window.componentE = componentE
+window.vm = rootVm
