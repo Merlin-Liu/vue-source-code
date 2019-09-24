@@ -56,44 +56,59 @@ const componentE = {
   }
 }
 
+const componentVModel = {
+  name: 'componentVModel',
+
+  data () {
+    return {
+      inputVal: '121dsdsd'
+    }
+  },
+
+  render (createElement) {
+    const input = createElement('input', {
+      // 使用domProps属性来绑定input原生value
+      domProps:{
+        value: this.inputVal
+      },
+
+      on: {
+        // v-model
+        input: ({target: {value}}) => {
+          this.inputVal = value
+        }
+      }
+    })
+
+    const p = createElement('p', this.inputVal)
+
+    return createElement('div', [input, p])
+  }
+}
+
+const componentSlot = {
+  name: 'componentSlot',
+
+  template: `<div><slot></slot><slot name="slotA"></slot><slot name="slotB"></slot></div>`
+}
+
 const rootVm = new Vue({
   components: {
+    componentSlot
   },
+
+  template: `<component-slot><p>i am slot default</p><p slot="slotA">i am slot A</p><p slot="slotB">i am slot B</p></component-slot>`,
 
   props: {
   },
 
   data: {
-    inputVal: 'tsfdf'
   },
 
   filters: {
   },
 
   computed: {
-  },
-
-  render (createElement) {
-    const input = createElement(
-      'input',
-      {
-        // 使用domProps属性来绑定input原生value
-        domProps:{
-          value: this.inputVal
-        },
-
-        on: {
-          // v-model
-          input: ({target: {value}}) => {
-            this.inputVal = value
-          }
-        }
-      }
-    )
-
-    const p = createElement('p', this.inputVal)
-
-    return createElement('div', [input, p])
   },
 
   watch: {
