@@ -108,6 +108,10 @@ const componentSlotScope = {
   }
 }
 
+const componentKeepAlive = {
+  
+}
+
 const rootVm = new Vue({
   components: {
     componentSlotScope
@@ -115,7 +119,10 @@ const rootVm = new Vue({
 
   template:
     '<component-slot-scope>' +
-      `<template slot-scope="slotData"><p>{{slotData.text}}</p><p>{{slotData.msg}}</p></template>` +
+      '<template slot-scope="slotData">' +
+        '<p>{{slotData.text}}</p>' +
+        '<p>{{slotData.msg}}</p>' +
+      '</template>' +
     '</component-slot-scope>',
 
   props: {
