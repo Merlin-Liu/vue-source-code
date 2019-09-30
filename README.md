@@ -1,6 +1,6 @@
 # vue源代码解析
 
-使用console分析整个流程.
+使用console分析整个流程
 
 log打在[vue.esm.js](./node_modules/vue/dist/vue.esm.js)中，如下效果
 
