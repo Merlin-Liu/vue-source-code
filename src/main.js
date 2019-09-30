@@ -108,27 +108,44 @@ const componentSlotScope = {
   }
 }
 
-const componentKeepAlive = {
-  
+const componentKeepAliveA = {
+  name: 'componentKeepAliveA',
+
+  template:
+    '<div class="a">' +
+      '<p>Comp A</p>' +
+    '</div>'
+}
+
+const componentKeepAliveB = {
+  name: 'componentKeepAliveB',
+
+  template:
+    '<div class="b">' +
+      '<p>Comp B</p>' +
+    '</div>'
 }
 
 const rootVm = new Vue({
   components: {
-    componentSlotScope
+    componentKeepAliveA,
+    componentKeepAliveB
   },
 
   template:
-    '<component-slot-scope>' +
-      '<template slot-scope="slotData">' +
-        '<p>{{slotData.text}}</p>' +
-        '<p>{{slotData.msg}}</p>' +
-      '</template>' +
-    '</component-slot-scope>',
+    '<div>' +
+      '<keep-alive>' +
+        '<component :is="currentComponent"></component>' +
+      '</keep-alive>' +
+
+      '<button @click="change">Switch</button>' +
+    '</div>',
 
   props: {
   },
 
   data: {
+    currentComponent: 'componentKeepAliveA'
   },
 
   filters: {
@@ -141,6 +158,10 @@ const rootVm = new Vue({
   },
 
   methods: {
+    change() {
+      this.currentComponent = this.currentComponent === 'componentKeepAliveB'
+        ? 'componentKeepAliveA' : 'componentKeepAliveB'
+    }
   }
 })
 
