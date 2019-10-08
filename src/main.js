@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { throws } from 'assert'
 
 const handleClick = function () {
   alert('click')
@@ -126,27 +127,61 @@ const componentKeepAliveB = {
     '</div>'
 }
 
+const eventComponent = {
+  name: 'eventComponent',
+
+  render(createElement) {
+    return createElement('button', {
+      on: {
+        click: this.handleClick
+      }
+    }, 'Click Me')
+  },
+
+  methods: {
+    handleClick(e) {
+      console.warn(e)
+      console.log('button click!')
+      this.$emit('select')
+    }
+  }
+}
+
 const rootVm = new Vue({
   components: {
     componentKeepAliveA,
     componentKeepAliveB
   },
 
-  template:
-    '<div>' +
-      '<keep-alive>' +
-        '<component :is="currentComponent"></component>' +
-      '</keep-alive>' +
+  // template:
+  //   '<div>' +
+  //     '<keep-alive>' +
+  //       '<component :is="currentComponent"></component>' +
+  //     '</keep-alive>' +
 
-      '<button @click="change">Switch</button>' +
-    '</div>',
+  //     '<button @click="change">Switch</button>' +
+  //   '</div>',
 
   props: {
   },
 
-  data: {
-    currentComponent: 'componentKeepAliveA'
+  render(createElement) {
+    return createElement('div', [
+      createElement(eventComponent, {
+        nativeOn: {
+          click: this.nativeClickHandle
+        },
+
+        on: {
+          select: this.selectHandle
+        }
+      })
+    ])
   },
+
+  // data: {
+  //   currentComponent: 'componentKeepAliveA'
+  // },
 
   filters: {
   },
@@ -158,6 +193,14 @@ const rootVm = new Vue({
   },
 
   methods: {
+    nativeClickHandle() {
+      console.log('eventComponent click!')
+    },
+
+    selectHandle() {
+      console.log('on select!')
+    },
+
     change() {
       this.currentComponent = this.currentComponent === 'componentKeepAliveB'
         ? 'componentKeepAliveA' : 'componentKeepAliveB'
