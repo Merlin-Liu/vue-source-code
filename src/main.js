@@ -1,5 +1,22 @@
 import Vue from 'vue'
-import { throws } from 'assert'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+const store = new Vuex.Store({
+  state: {
+    count: {
+      countA: 0,
+      countB: 0
+    }
+  },
+  mutations: {
+    increment (state) {
+      state.count.countA++
+      state.count.countB++
+    }
+  }
+})
 
 const handleClick = function () {
   alert('click')
@@ -149,8 +166,6 @@ const eventComponent = {
 
 const rootVm = new Vue({
   components: {
-    componentKeepAliveA,
-    componentKeepAliveB
   },
 
   // template:
@@ -167,21 +182,30 @@ const rootVm = new Vue({
 
   render(createElement) {
     return createElement('div', [
-      createElement(eventComponent, {
-        nativeOn: {
-          click: this.nativeClickHandle
-        },
-
+      createElement('p', 'current countA: ' + this.$store.state.count.countA),
+      createElement('p', 'current countB: ' + this.$store.state.count.countB),
+      createElement('p', 'current arrayData: ' + this.arrayData),
+      createElement('p', 'current objectData: ' + this.objectData.c),
+      createElement('button', {
         on: {
-          select: this.selectHandle
+          click: () => {
+            this.$store.commit('increment')
+            const array = this.arrayData
+            const lastIndex = array.length - 1
+            this.arrayData.push(array[lastIndex] + 1)
+          }
         }
-      })
+      }, 'increment')
     ])
   },
 
-  // data: {
-  //   currentComponent: 'componentKeepAliveA'
-  // },
+  data: {
+    arrayData: [1, 2, 3, 4, 5, 6],
+    objectData: {
+      a: 1,
+      b: 10
+    }
+  },
 
   filters: {
   },
@@ -193,19 +217,9 @@ const rootVm = new Vue({
   },
 
   methods: {
-    nativeClickHandle() {
-      console.log('eventComponent click!')
-    },
+  },
 
-    selectHandle() {
-      console.log('on select!')
-    },
-
-    change() {
-      this.currentComponent = this.currentComponent === 'componentKeepAliveB'
-        ? 'componentKeepAliveA' : 'componentKeepAliveB'
-    }
-  }
+  store
 })
 
 // 挂载
