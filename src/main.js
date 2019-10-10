@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from '../vue'
+import Vuex from '../vuex'
 
 Vue.use(Vuex)
 
@@ -15,7 +15,8 @@ const store = new Vuex.Store({
       state.count.countA++
       state.count.countB++
     }
-  }
+  },
+  strict: 1
 })
 
 const handleClick = function () {
@@ -182,16 +183,12 @@ const rootVm = new Vue({
 
   render(createElement) {
     return createElement('div', [
-      // createElement('p', 'current countA: ' + this.$store.state.count.countA),
-      // createElement('p', 'current countB: ' + this.$store.state.count.countB),
-      createElement('p', 'current objectData: ' + this.objectData.b),
+      createElement('p', 'current countA: ' + this.$store.state.count.countA),
+      createElement('p', 'current countB: ' + this.$store.state.count.countB),
       createElement('button', {
         on: {
           click: () => {
-            // this.$store.commit('increment')
-            const array = this.objectData.b
-            const lastIndex = array.length - 1
-            this.objectData.b.push(array[lastIndex] + 1)
+            this.$store.commit('increment')
           }
         }
       }, 'increment')
@@ -199,11 +196,6 @@ const rootVm = new Vue({
   },
 
   data: {
-    // arrayData: [{a: 1}],
-    objectData: {
-      a: 1,
-      b: [1, 2, 3]
-    }
   },
 
   filters: {
@@ -226,3 +218,4 @@ rootVm.$mount('#app')
 
 window.Vue = Vue
 window.vm = rootVm
+window.store = store
