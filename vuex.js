@@ -233,8 +233,10 @@ var functionAssert = {
 };
 
 var objectAssert = {
-  assert: function (value) { return typeof value === 'function' ||
-    (typeof value === 'object' && typeof value.handler === 'function'); },
+  assert: function (value) {
+    return typeof value === 'function' || (typeof value === 'object' && typeof value.handler === 'function');
+  },
+
   expected: 'function or object with "handler" function'
 };
 
