@@ -182,17 +182,16 @@ const rootVm = new Vue({
 
   render(createElement) {
     return createElement('div', [
-      createElement('p', 'current countA: ' + this.$store.state.count.countA),
-      createElement('p', 'current countB: ' + this.$store.state.count.countB),
-      createElement('p', 'current arrayData: ' + this.arrayData),
-      createElement('p', 'current objectData: ' + this.objectData.c),
+      // createElement('p', 'current countA: ' + this.$store.state.count.countA),
+      // createElement('p', 'current countB: ' + this.$store.state.count.countB),
+      createElement('p', 'current objectData: ' + this.objectData.b),
       createElement('button', {
         on: {
           click: () => {
-            this.$store.commit('increment')
-            const array = this.arrayData
+            // this.$store.commit('increment')
+            const array = this.objectData.b
             const lastIndex = array.length - 1
-            this.arrayData.push(array[lastIndex] + 1)
+            this.objectData.b.push(array[lastIndex] + 1)
           }
         }
       }, 'increment')
@@ -200,10 +199,10 @@ const rootVm = new Vue({
   },
 
   data: {
-    arrayData: [1, 2, 3, 4, 5, 6],
+    // arrayData: [{a: 1}],
     objectData: {
       a: 1,
-      b: 10
+      b: [1, 2, 3]
     }
   },
 
