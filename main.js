@@ -168,7 +168,7 @@ const eventComponent = {
 }
 
 const childVue = Vue.extend({
-  template: '<p>{{firstName}} {{lastName}} aka {{alias}} {{text}} {{textMixin}}</p>',
+  template: '<p>{{firstName}} {{lastName}} aka {{alias}} {{text}}</p>',
   data() {
     return {
       firstName: 1,
@@ -176,24 +176,49 @@ const childVue = Vue.extend({
       alias: 3,
       text: 4
     }
+  },
+
+  props: {
+    a: Number
+  },
+
+  computed: {
+    s () {
+      return this.firstName + this.lastName
+    }
   }
 })
-
-Vue.mixin({ data () {
- return {
-   firstName: 'Walter',
-   lastName: 'White',
-   alias: 'Heisenberg',
-   textMixin: 'textMixin'
- }
-}})
 
 // childVue.mixin({
 //   created() {
 //     console.error('child mixin')
 //   }
 // })
-window.child = new childVue().$mount('#app')
+window.child = new childVue({
+  template: '<p>{{s}} {{sb}}</p>',
+  props: {
+    b: Number
+  },
+
+  computed: {
+    sb () {
+      return this.s + '1'
+    }
+  }
+}).$mount('#app')
+
+new childVue({
+  template: '<p>{{s}} {{sb}}</p>',
+  props: {
+    b: Number
+  },
+
+  computed: {
+    sb () {
+      return this.s + '1'
+    }
+  }
+}).$mount('#app2')
 
 // const rootVm = new Vue({
 //   components: {

@@ -4611,15 +4611,13 @@ function initExtend (Vue) {
     Sub.prototype.constructor = Sub;
 
     Sub.cid = cid++;
-    Sub.options = mergeOptions(
-      Super.options,
-      extendOptions
-    );
+    Sub.options = mergeOptions(Super.options, extendOptions);
     Sub['super'] = Super;
 
     // For props and computed properties, we define the proxy getters on
     // the Vue instances at extension time, on the extended prototype. This
     // avoids Object.defineProperty calls for each instance created.
+    // 有疑问🤔️ ❓，这段什么意思？
     if (Sub.options.props) {
       initProps$1(Sub);
     }
