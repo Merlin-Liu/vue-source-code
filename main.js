@@ -1,23 +1,25 @@
-import Vue from '../vue'
-import Vuex from '../vuex'
+// 拷贝的vue源码，即./node_modules/vue/dist/vue.esm.js
+import Vue from './vue'
+// 拷贝的vuex源码，即./node_modules/vuex/dist/vuex.esm.js
+import Vuex from './vuex'
 
-Vue.use(Vuex)
+// Vue.use(Vuex)
 
-const store = new Vuex.Store({
-  state: {
-    count: {
-      countA: 0,
-      countB: 0
-    }
-  },
-  mutations: {
-    increment (state) {
-      state.count.countA++
-      state.count.countB++
-    }
-  },
-  strict: 1
-})
+// const store = new Vuex.Store({
+//   state: {
+//     count: {
+//       countA: 0,
+//       countB: 0
+//     }
+//   },
+//   mutations: {
+//     increment (state) {
+//       state.count.countA++
+//       state.count.countB++
+//     }
+//   },
+//   strict: 1
+// })
 
 const handleClick = function () {
   alert('click')
@@ -165,57 +167,75 @@ const eventComponent = {
   }
 }
 
-const rootVm = new Vue({
-  components: {
-  },
-
-  // template:
-  //   '<div>' +
-  //     '<keep-alive>' +
-  //       '<component :is="currentComponent"></component>' +
-  //     '</keep-alive>' +
-
-  //     '<button @click="change">Switch</button>' +
-  //   '</div>',
-
-  props: {
-  },
-
-  render(createElement) {
-    return createElement('div', [
-      createElement('p', 'current countA: ' + this.$store.state.count.countA),
-      createElement('p', 'current countB: ' + this.$store.state.count.countB),
-      createElement('button', {
-        on: {
-          click: () => {
-            this.$store.commit('increment')
-          }
-        }
-      }, 'increment')
-    ])
-  },
-
-  data: {
-  },
-
-  filters: {
-  },
-
-  computed: {
-  },
-
-  watch: {
-  },
-
-  methods: {
-  },
-
-  store
+const childVue = Vue.extend({
+  template: '<p>{{firstName}} {{lastName}} aka {{alias}} {{text}} {{textMixin}}</p>',
+  data() {
+    return {
+      firstName: 1,
+      lastName: 2,
+      alias: 3,
+      text: 4
+    }
+  }
 })
 
+Vue.mixin({ data () {
+ return {
+   firstName: 'Walter',
+   lastName: 'White',
+   alias: 'Heisenberg',
+   textMixin: 'textMixin'
+ }
+}})
+
+// childVue.mixin({
+//   created() {
+//     console.error('child mixin')
+//   }
+// })
+new childVue().$mount('#app')
+
+// const rootVm = new Vue({
+//   components: {
+//   },
+
+//   // template:
+//   //   '<div>' +
+//   //     '<keep-alive>' +
+//   //       '<component :is="currentComponent"></component>' +
+//   //     '</keep-alive>' +
+
+//   //     '<button @click="change">Switch</button>' +
+//   //   '</div>',
+
+//   props: {
+//   },
+
+//   render(createElement) {
+//     return createElement('div', 3333)
+//   },
+
+//   data: {
+//   },
+
+//   filters: {
+//   },
+
+//   computed: {
+//   },
+
+//   watch: {
+//   },
+
+//   methods: {
+//   },
+
+//   // store
+// })
+
 // 挂载
-rootVm.$mount('#app')
+// rootVm.$mount('#app')
 
 window.Vue = Vue
-window.vm = rootVm
-window.store = store
+// window.vm = rootVm
+// window.store = store

@@ -8,6 +8,10 @@
 const PROP_LOG = true
 const DATA_LOG = true
 
+console.object = function(obj) {
+  console.log(Object.assign({}, obj))
+}
+
 console.groupProp = function(str) {
   console.group(`%c${str}`, 'color:#fff;background:red;font-size:14px')
 }
@@ -87,13 +91,7 @@ function isFalse (v) {
  * Check if value is primitive
  */
 function isPrimitive (value) {
-  return (
-    typeof value === 'string' ||
-    typeof value === 'number' ||
-    // $flow-disable-line
-    typeof value === 'symbol' ||
-    typeof value === 'boolean'
-  )
+  return (typeof value === 'string' || typeof value === 'number' || typeof value === 'symbol' || typeof value === 'boolean')
 }
 
 /**
@@ -4406,6 +4404,8 @@ function initMixin (Vue) {
     else {
       console.groupColor(undefined, '根组件的合并配置开始');
 
+      // vm.constructor就是Vue类
+      // options就是new Vue中传入的对象 e.g. {template: `<div>{{a}}</div>`, data: { a: 1 }}
       vm.$options = mergeOptions(resolveConstructorOptions(vm.constructor), options || {}, vm);
 
       console.groupEndColor(undefined, '根组件的合并配置结束');
@@ -4467,25 +4467,34 @@ function initInternalComponent (vm, options) {
 
 function resolveConstructorOptions (Ctor) {
   var options = Ctor.options;
+
+  // 有super属性，说明Ctor是Vue.extend构建的子类
   if (Ctor.super) {
+    // 获取父类的最新的options
     var superOptions = resolveConstructorOptions(Ctor.super);
+    // 子类本身的superOptions
     var cachedSuperOptions = Ctor.superOptions;
+
+    // 若父类最新的options和子类本身的superOptions不相等，说明父类的options改变过了
+    // 例如执行了Parent.mixin方法
+    // 这时则需要把子类本身的superOptions换成父类最新的options
     if (superOptions !== cachedSuperOptions) {
-      // super option changed,
-      // need to resolve new options.
-      Ctor.superOptions = superOptions;
-      // check if there are any late-modified/attached options (#4976)
+      Ctor.superOptions = superOptions; // 替换成最新的
+
+      // 检查子类的options是否变化
+      // 例如子类执行了Child.mixin方法
       var modifiedOptions = resolveModifiedOptions(Ctor);
-      // update base extend options
       if (modifiedOptions) {
-        extend(Ctor.extendOptions, modifiedOptions);
+        extend(Ctor.extendOptions, modifiedOptions); // 替换成最新的
       }
+
       options = Ctor.options = mergeOptions(superOptions, Ctor.extendOptions);
       if (options.name) {
         options.components[options.name] = Ctor;
       }
     }
   }
+
   return options
 }
 
