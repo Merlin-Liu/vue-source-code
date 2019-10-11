@@ -4588,6 +4588,7 @@ function initExtend (Vue) {
     extendOptions = extendOptions || {};
     var Super = this;
     var SuperId = Super.cid;
+
     var cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {});
     if (cachedCtors[SuperId]) {
       return cachedCtors[SuperId]
@@ -4601,8 +4602,14 @@ function initExtend (Vue) {
     var Sub = function VueComponent (options) {
       this._init(options);
     };
+
+    // 典型的原型继承
     Sub.prototype = Object.create(Super.prototype);
+    // 也可以用如下的做法
+    // Sub.prototype = new Super();  // new Super().__proto__ === Object.create(Super.prototype).__proto__ true
+    // ⚠️不过，之所以不用该做法的原因是new Super即new Vue会再一次触发Vue构造函数
     Sub.prototype.constructor = Sub;
+
     Sub.cid = cid++;
     Sub.options = mergeOptions(
       Super.options,

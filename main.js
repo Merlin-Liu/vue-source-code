@@ -193,7 +193,7 @@ Vue.mixin({ data () {
 //     console.error('child mixin')
 //   }
 // })
-new childVue().$mount('#app')
+window.child = new childVue().$mount('#app')
 
 // const rootVm = new Vue({
 //   components: {
@@ -239,3 +239,4 @@ new childVue().$mount('#app')
 window.Vue = Vue
 // window.vm = rootVm
 // window.store = store
+window.childVue = childVue
