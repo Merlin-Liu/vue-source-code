@@ -194,74 +194,75 @@ const childVue = Vue.extend({
 //     console.error('child mixin')
 //   }
 // })
-window.child = new childVue({
-  template: '<p>{{s}} {{sb}}</p>',
-  props: {
-    b: Number
-  },
-
-  computed: {
-    sb () {
-      return this.s + '1'
-    }
-  }
-}).$mount('#app')
-
-new childVue({
-  template: '<p>{{s}} {{sb}}</p>',
-  props: {
-    b: Number
-  },
-
-  computed: {
-    sb () {
-      return this.s + '1'
-    }
-  }
-}).$mount('#app2')
-
-// const rootVm = new Vue({
-//   components: {
-//   },
-
-//   // template:
-//   //   '<div>' +
-//   //     '<keep-alive>' +
-//   //       '<component :is="currentComponent"></component>' +
-//   //     '</keep-alive>' +
-
-//   //     '<button @click="change">Switch</button>' +
-//   //   '</div>',
-
+// window.child = new childVue({
+//   template: '<p>{{s}} {{sb}}</p>',
 //   props: {
-//   },
-
-//   render(createElement) {
-//     return createElement('div', 3333)
-//   },
-
-//   data: {
-//   },
-
-//   filters: {
+//     b: Number
 //   },
 
 //   computed: {
+//     sb () {
+//       return this.s + '1'
+//     }
+//   }
+// }).$mount('#app')
+
+// new childVue({
+//   template: '<p>{{s}} {{sb}}</p>',
+//   props: {
+//     b: Number
 //   },
 
-//   watch: {
-//   },
+//   computed: {
+//     sb () {
+//       return this.s + '1'
+//     }
+//   }
+// }).$mount('#app2')
 
-//   methods: {
-//   },
+const rootVm = new Vue({
+  components: {
+  },
 
-//   // store
-// })
+  // template:
+  //   '<div>' +
+  //     '<keep-alive>' +
+  //       '<component :is="currentComponent"></component>' +
+  //     '</keep-alive>' +
+
+  //     '<button @click="change">Switch</button>' +
+  //   '</div>',
+
+  props: {
+  },
+
+  render(createElement) {
+    return createElement('div', this.num)
+  },
+
+  data: {
+    num: 1
+  },
+
+  filters: {
+  },
+
+  computed: {
+  },
+
+  watch: {
+  },
+
+  methods: {
+  },
+
+  // store
+})
 
 // 挂载
-// rootVm.$mount('#app')
+rootVm.$mount('#app')
 
 window.Vue = Vue
-// window.vm = rootVm
+window.vm = rootVm
 // window.store = store
 window.childVue = childVue
