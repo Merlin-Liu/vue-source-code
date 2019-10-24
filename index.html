@@ -4,11 +4,37 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>vue-code-study</title>
+    <style>
+      body {
+        padding: 0 20px;
+        background-color: #eff3f4;
+      }
+      .vue-container {
+        box-sizing: border-box;
+        width: 100%;
+        height: 650px;
+        padding: 20px;
+        background-color: #fff;
+      }
+      .ctol-container {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 20px;
+        background-color: #fff;
+      }
+    </style>
   </head>
   <body>
-    <div id="app">APP节点</div>
-    <p>app 后的节点</p>
-    <!-- built files will be auto injected -->
-    <div id="app2">APP2节点</div>
+    <h2>vue内容区</h2>
+    <div class="vue-container">
+        <div id="app">APP节点</div>
+        <p>APP后的节点</p>
+        <div id="app2">APP2节点</div>
+    </div>
+    <h2>控制区</h2>
+    <div class="ctol-container"></div>
   </body>
+
+  <script>
+  </script>
 </html>
