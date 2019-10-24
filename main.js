@@ -236,12 +236,15 @@ const rootVm = new Vue({
   props: {
   },
 
-  render(createElement) {
-    return createElement('div', this.num)
+  render(h) {
+    return h('p', [
+      this.num,
+      h('button', {on: { click: this.add }}, 'add')
+    ])
   },
 
   data: {
-    num: 1
+    num: 0
   },
 
   filters: {
@@ -254,6 +257,9 @@ const rootVm = new Vue({
   },
 
   methods: {
+    add() {
+      this.num += 1
+    }
   },
 
   // store
