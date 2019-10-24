@@ -4635,8 +4635,9 @@ function initExtend (Vue) {
     ASSET_TYPES.forEach(function (type) {
       Sub[type] = Super[type];
     });
-    // enable recursive self-lookup
+
     if (name) {
+      //如果有组件名称，将该组件挂载到components上。以便可在组件内使用
       Sub.options.components[name] = Sub;
     }
 
