@@ -32,6 +32,8 @@
 
 * [vue运行机制](./doc/运行机制.md)
 
+* [组件化](./doc/组件化.md)
+
 vue文件引入过程，如下图：
 
 ![](./static/import.png)
