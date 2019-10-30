@@ -34,6 +34,8 @@
 
 * [组件化](./doc/组件化.md)
 
+* [编译](./doc/编译.md)
+
 vue文件引入过程，如下图：
 
 ![](./static/import.png)
