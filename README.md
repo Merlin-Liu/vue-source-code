@@ -36,6 +36,8 @@
 
 * [编译](./doc/编译.md)
 
+* [扩展](./doc/扩展.md)
+
 vue文件引入过程，如下图：
 
 ![](./static/import.png)
