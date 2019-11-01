@@ -32,9 +32,9 @@
 
 * [组件化](./docs/components/index.md)
 
-* [编译](./docs/编译.md)
+* [编译](./docs/parse/index.md)
 
-* [扩展](./docs/扩展.md)
+* [扩展](./docs/extend/index.md)
 
 vue文件引入过程，如下图：
 
