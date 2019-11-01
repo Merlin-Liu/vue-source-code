@@ -26,13 +26,11 @@
 
 ## 目录
 
-<!-- * [vue整体流程](./doc/整体流程.md) -->
-
 * [vue文件引入过程](./doc/引入过程.md)
 
-* [vue运行机制](./doc/运行机制.md)
+* [响应式](./doc/reactive/index.md)
 
-* [组件化](./doc/组件化.md)
+* [组件化](./doc/components/index.md)
 
 * [编译](./doc/编译.md)
 
