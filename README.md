@@ -26,15 +26,15 @@
 
 ## 目录
 
-* [vue文件引入过程](./doc/引入过程.md)
+* [vue文件引入过程](./docs/引入过程.md)
 
-* [响应式](./doc/reactive/index.md)
+* [响应式](./docs/reactive/index.md)
 
-* [组件化](./doc/components/index.md)
+* [组件化](./docs/components/index.md)
 
-* [编译](./doc/编译.md)
+* [编译](./docs/编译.md)
 
-* [扩展](./doc/扩展.md)
+* [扩展](./docs/扩展.md)
 
 vue文件引入过程，如下图：
 
