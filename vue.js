@@ -3330,7 +3330,6 @@ function initComputed (vm, computed) {
     }
 
     // create internal watcher for the computed property.
-    console.log(key)
     watchers[key] = new Watcher(vm, getter || noop, noop, computedWatcherOptions);
 
     // component-defined computed properties are already defined on the
@@ -4203,11 +4202,14 @@ function _createElement (context, tag, data, children, normalizationType) {
   }
 
   // support single function children as default scoped slot
+  // 支持单一函数children作为默认插槽
   if (Array.isArray(children) && typeof children[0] === 'function') {
     data = data || {};
     data.scopedSlots = { default: children[0] };
     children.length = 0;
   }
+
+  // 格式化children
   if (normalizationType === ALWAYS_NORMALIZE) {
     children = normalizeChildren(children);
   }
