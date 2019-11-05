@@ -233,7 +233,7 @@ const rootVm = new Vue({
   //     '<button @click="change">Switch</button>' +
   //   '</div>',
 
-  template: `<p>{{numSecond}}<button @click="add">add</button></p>`,
+  template: `<p>{{numSecond}}<button @click="add">add</button>{{numThird}}</p>`,
 
   props: {
   },
@@ -259,6 +259,10 @@ const rootVm = new Vue({
 
     numSecond() {
       return 'second,' + this.numFirst
+    },
+
+    numThird() {
+      return 'third, ' + this.num
     }
   },
 

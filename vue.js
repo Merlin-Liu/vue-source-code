@@ -727,7 +727,7 @@ Dep.prototype.removeSub = function removeSub (sub) {
 };
 
 Dep.prototype.depend = function depend () {
-  if (Dep.target) {
+  if (Dep.target) { // target就watcher对象
     Dep.target.addDep(this);
   }
 };
@@ -748,7 +748,9 @@ Dep.target = null;
 var targetStack = [];
 
 function pushTarget (_target) {
-  if (Dep.target) { targetStack.push(Dep.target); }
+  if (Dep.target) {
+    targetStack.push(Dep.target);
+  }
   Dep.target = _target;
 }
 
@@ -3059,7 +3061,7 @@ Watcher.prototype.addDep = function addDep (dep) {
     this.newDepIds.add(id);
     this.newDeps.push(dep);
     if (!this.depIds.has(id)) {
-      console.log(`add dep success, depId ${id}`)
+      console.log(`watcher添加dep成功, depId ${id}, wacher的getter为：${this.getter}`)
       dep.addSub(this);
     }
     else {

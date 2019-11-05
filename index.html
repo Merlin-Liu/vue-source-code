@@ -32,9 +32,49 @@
         <div id="app2">APP2节点</div>
     </div>
     <h2>控制区</h2>
-    <div class="ctol-container"></div>
+    <div class="ctol-container">
+      <p>
+        <button>init Console Control</button>
+        <span></span>
+      </p>
+      <p>
+        <button>parse Console Control</button>
+        <span></span>
+      </p>
+      <p>
+        <button>render Console Control</button>
+        <span></span>
+      </p>
+      <p>
+        <button>update Console Control</button>
+        <span></span>
+      </p>
+    </div>
   </body>
 
-  <script>
-  </script>
+<script>
+  const textMap = ['关', '开']
+  const stateBtnGroup = document.querySelectorAll('.ctol-container button')
+  const stateTextGroup = document.querySelectorAll('.ctol-container span')
+
+  function init() {
+    ['init', 'parse', 'render', 'update'].map((stateKey, index) => {
+      // 初始化数据
+      const stateVal = parseInt(localStorage.getItem(stateKey)) || 0
+      const stateText = stateTextGroup[index]
+      stateText.innerHTML = textMap[stateVal]
+
+      // 绑定事件
+      const stateBtn = stateBtnGroup[index]
+      stateBtn.addEventListener('click', () => {
+        const currentStateVal = parseInt(localStorage.getItem(stateKey)) || 0
+        const newStateVal = +!currentStateVal
+        localStorage.setItem(stateKey, newStateVal)
+        window.location.reload()
+      })
+    })
+  }
+
+  init()
+</script>
 </html>
