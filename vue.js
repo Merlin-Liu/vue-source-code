@@ -2118,6 +2118,8 @@ function checkProp (res, hash, key, altKey, preserve) {
 // normalization is needed - if any child is an Array, we flatten the whole
 // thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
 // because functional components already normalize their own children.
+// 注释
+// 将children数组flatten到只有一层
 function simpleNormalizeChildren (children) {
   for (var i = 0; i < children.length; i++) {
     if (Array.isArray(children[i])) {
@@ -2131,6 +2133,10 @@ function simpleNormalizeChildren (children) {
 // e.g. <template>, <slot>, v-for, or when the children is provided by user
 // with hand-written render functions / JSX. In such cases a full normalization
 // is needed to cater to all possible types of children values.
+// 注释
+// 一些情况下children会包含嵌套数组，比如模版里有<template>, <slot>, v-for或者用户手写的render函数
+// normalizeArrayChildren会展开children中的嵌套数组，使children只有一层。
+// 同时如果遇到连续的多个文本节点，normalizeArrayChildren会把它们合并成一个文本节点。
 function normalizeChildren (children) {
   return isPrimitive(children) ? [createTextVNode(children)] : (Array.isArray(children) ? normalizeArrayChildren(children) : undefined)
 }
@@ -2635,24 +2641,28 @@ function lifecycleMixin (Vue) {
   };
 }
 
-function mountComponent (vm, el, hydrating) {
+// 挂载组件
+function mountComponent (vm, el, hydrating /* 服务端渲染 */) {
   vm.$el = el;
+
   if (!vm.$options.render) {
     vm.$options.render = createEmptyVNode;
     if (process.env.NODE_ENV !== 'production') {
-
-      if ((vm.$options.template && vm.$options.template.charAt(0) !== '#') ||
-        vm.$options.el || el) {
-        warn('You are using the runtime-only build of Vue where the template ' + 'compiler is not available. Either pre-compile the templates into ' + 'render functions, or use the compiler-included build.', vm);
-      } else {
+      if ((vm.$options.template && vm.$options.template.charAt(0) !== '#') || vm.$options.el || el) {
+        // runtime-only版本，但是使用了template，警告
+        warn('You are using the runtime-only build of Vue where the template compiler is not available. Either pre-compile the templates into render functions, or use the compiler-included build.', vm);
+      }
+      else {
+        // 没有render方法和template
         warn('Failed to mount component: template or render function not defined.', vm);
       }
     }
   }
+
+  // 调用beforeMount生命周期钩子
   callHook(vm, 'beforeMount');
 
   var updateComponent;
-
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
     updateComponent = function () {
       var name = vm._name;
@@ -2670,7 +2680,8 @@ function mountComponent (vm, el, hydrating) {
       mark(endTag);
       measure(("vue " + name + " patch"), startTag, endTag);
     };
-  } else {
+  }
+  else {
     updateComponent = function () {
       vm._update(vm._render(), hydrating);
     };
@@ -2679,7 +2690,11 @@ function mountComponent (vm, el, hydrating) {
   // we set this to vm._watcher inside the watcher's constructor
   // since the watcher's initial patch may call $forceUpdate (e.g. inside child
   // component's mounted hook), which relies on vm._watcher being already defined
-  new Watcher(vm, updateComponent, noop, null, true /* isRenderWatcher */);
+  // 注释：
+  // 🔥 创建渲染Watcher
+  // updateComponent => vm._update(vm._render())
+  // vm._render()返回的vnode
+  new Watcher(vm, updateComponent, noop, null, true /* 作为渲染wacther */);
   hydrating = false;
 
   // manually mounted instance, call mounted on self
@@ -2956,7 +2971,13 @@ var uid$1 = 0;
  */
 var Watcher = function Watcher (vm, expOrFn, cb, options, isRenderWatcher) {
   const fnName = expOrFn.name ? expOrFn.name : expOrFn
-  console.log(`new Watcher ( ${fnName} ${expOrFn.name ? expOrFn : ''})\n\n`)
+  if (isRenderWatcher) {
+    console.log(`%c创建渲染Watcher：`, 'color:#fff;background:red;font-size:20px;font-weight:700')
+  }
+  else {
+    console.log(`%c创建普通Watcher：`, 'color:#fff;background:red;font-size:20px;font-weight:700')
+  }
+  console.log(`${fnName} = ${expOrFn.name ? expOrFn : ''}\n\n`)
 
   this.vm = vm;
   if (isRenderWatcher) {
@@ -2990,7 +3011,7 @@ var Watcher = function Watcher (vm, expOrFn, cb, options, isRenderWatcher) {
     this.getter = parsePath(expOrFn);
     if (!this.getter) {
       this.getter = noop;
-      process.env.NODE_ENV !== 'production' && warn("Failed watching path: \"" + expOrFn + "\" " + 'Watcher only accepts simple dot-delimited paths. ' + 'For full control, use a function instead.', vm);
+      process.env.NODE_ENV !== 'production' && warn("Failed watching path: \"" + expOrFn + "\" " + 'Watcher only accepts simple dot-delimited paths. For full control, use a function instead.', vm);
     }
   }
 
@@ -3024,7 +3045,7 @@ Watcher.prototype.get = function get () {
       traverse(value);
     }
     popTarget();
-    this.cleanupDeps();
+    this.cleanupDeps(); // 🔥 清空依赖收集
   }
   return value
 };
@@ -4161,11 +4182,13 @@ function _createElement (context, tag, data, children, normalizationType) {
   console.group_CreateElement(`一个创建vnode过程开始：这是一个${type}，${type}名：${type === '组件' ? tag.name : tag}   `)
 
   if (isDef(data) && isDef((data).__ob__)) {
+    // 使用被观察过的对象作为vnode的data， waring
     process.env.NODE_ENV !== 'production' && warn("Avoid using observed data object as vnode data: " + (JSON.stringify(data)) + "\n" + 'Always create fresh vnode data objects in each render!', context);
     return createEmptyVNode()
   }
 
   // object syntax in v-bind
+  // is属性
   if (isDef(data) && isDef(data.is)) {
     tag = data.is;
   }
@@ -4187,9 +4210,11 @@ function _createElement (context, tag, data, children, normalizationType) {
   }
   if (normalizationType === ALWAYS_NORMALIZE) {
     children = normalizeChildren(children);
-  } else if (normalizationType === SIMPLE_NORMALIZE) {
+  }
+  else if (normalizationType === SIMPLE_NORMALIZE) {
     children = simpleNormalizeChildren(children);
   }
+
   var vnode, ns;
   if (typeof tag === 'string') {
     var Ctor;
@@ -4314,7 +4339,6 @@ function renderMixin (Vue) {
     // reset _rendered flag on slots for duplicate slot check
     if (process.env.NODE_ENV !== 'production') {
       for (var key in vm.$slots) {
-        // $flow-disable-line
         vm.$slots[key]._rendered = false;
       }
     }
@@ -4329,8 +4353,19 @@ function renderMixin (Vue) {
     // render self
     var vnode;
     try {
+      // 1、_renderProxy就是vm
+      // 2、$createElement就是vue配置中render函数的h
+      // e.g.
+      // new Vue({
+      //   data: ...
+      //   props: ...
+      //   render(h) {
+      //     return h('div', {}, this.a)
+      //   }
+      // })
       vnode = render.call(vm._renderProxy, vm.$createElement);
-    } catch (e) {
+    }
+    catch (e) {
       handleError(e, vm, "render");
       // return error render result,
       // or previous vnode to prevent render error causing blank component
@@ -4350,6 +4385,7 @@ function renderMixin (Vue) {
         vnode = vm._vnode;
       }
     }
+
     // return empty vnode in case the render function errored out
     if (!(vnode instanceof VNode)) {
       if (process.env.NODE_ENV !== 'production' && Array.isArray(vnode)) {
@@ -4357,11 +4393,11 @@ function renderMixin (Vue) {
       }
       vnode = createEmptyVNode();
     }
+
     // set parent
     vnode.parent = _parentVnode;
 
-    console.groupEndColor(undefined, '一个_render 方法执行完成')
-    console.log('\n')
+    console.groupEndColor(undefined, '一个_render 方法执行完成\n')
     return vnode
   };
 }

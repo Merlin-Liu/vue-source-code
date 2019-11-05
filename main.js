@@ -233,15 +233,17 @@ const rootVm = new Vue({
   //     '<button @click="change">Switch</button>' +
   //   '</div>',
 
+  template: `<p>{{num}}<button @click="add">add</button></p>`,
+
   props: {
   },
 
-  render(h) {
-    return h('p', [
-      this.num,
-      h('button', {on: { click: this.add }}, 'add')
-    ])
-  },
+  // render(h) {
+  //   return h('p', [
+  //     this.num,
+  //     h('button', {on: { click: this.add }}, 'add')
+  //   ])
+  // },
 
   data: {
     num: 0
