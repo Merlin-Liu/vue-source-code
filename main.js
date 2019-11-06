@@ -160,7 +160,6 @@ const eventComponent = {
 
   methods: {
     handleClick(e) {
-      console.warn(e)
       console.log('button click!')
       this.$emit('select')
     }
@@ -224,26 +223,24 @@ const rootVm = new Vue({
   components: {
   },
 
-  // template:
-  //   '<div>' +
-  //     '<keep-alive>' +
-  //       '<component :is="currentComponent"></component>' +
-  //     '</keep-alive>' +
-
-  //     '<button @click="change">Switch</button>' +
-  //   '</div>',
-
   template: `<p>{{numSecond}}<button @click="add">add</button>{{numThird}}</p>`,
 
   props: {
   },
 
-  // render(h) {
-  //   return h('p', [
-  //     this.num,
-  //     h('button', {on: { click: this.add }}, 'add')
-  //   ])
-  // },
+  render(h) {
+    return h('p', {
+      class: 'test'
+    }, [
+      h(eventComponent, {
+        on: {
+          select: () => {
+            console.log(1111)
+          }
+        }
+      })
+    ])
+  },
 
   data: {
     num: 0
@@ -270,9 +267,6 @@ const rootVm = new Vue({
   },
 
   methods: {
-    add() {
-      this.num += 1
-    }
   },
 
   // store

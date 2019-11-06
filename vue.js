@@ -2550,30 +2550,36 @@ function initLifecycle (vm) {
 
 function lifecycleMixin (Vue) {
   Vue.prototype._update = function (vnode, hydrating) {
-    console.updateGroup('一个Vue实例的_update方法将要执行')
+    console.updateGroup('vm._update方法开始执行')
 
     var vm = this;
     if (vm._isMounted) {
       callHook(vm, 'beforeUpdate');
     }
+
     var prevEl = vm.$el;
     var prevVnode = vm._vnode;
     var prevActiveInstance = activeInstance;
     activeInstance = vm;
     vm._vnode = vnode;
+
     // Vue.prototype.__patch__ is injected in entry points
     // based on the rendering backend used.
+    // 首次挂载DOM的情况
     if (!prevVnode) {
-      // initial render
       vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false, vm.$options._parentElm, vm.$options._refElm);
       // no need for the ref nodes after initial patch
       // this prevents keeping a detached DOM tree in memory (#5851)
+      // 首次挂载不需要ref节点，这可以防止在内存中保留分离的DOM树
       vm.$options._parentElm = vm.$options._refElm = null;
-    } else {
-      // updates
+    }
+    // 更新DOM的情况
+    else {
       vm.$el = vm.__patch__(prevVnode, vnode);
     }
+
     activeInstance = prevActiveInstance;
+
     // update __vue__ reference
     if (prevEl) {
       prevEl.__vue__ = null;
@@ -2581,12 +2587,13 @@ function lifecycleMixin (Vue) {
     if (vm.$el) {
       vm.$el.__vue__ = vm;
     }
+
     // if parent is an HOC, update its $el as well
     if (vm.$vnode && vm.$parent && vm.$vnode === vm.$parent._vnode) {
       vm.$parent.$el = vm.$el;
     }
 
-    console.updateGroupEnd('一个Vue实例的_update方法执行完成')
+    console.updateGroupEnd('vm._update方法执行完成')
   };
 
   Vue.prototype.$forceUpdate = function () {
@@ -3969,9 +3976,10 @@ var componentVNodeHooks = {
       // kept-alive components, treat as a patch
       var mountedNode = vnode; // work around flow
       componentVNodeHooks.prepatch(mountedNode, mountedNode);
-    } else {
+    }
+    else {
       var child = vnode.componentInstance = createComponentInstanceForVnode(vnode, activeInstance, parentElm, refElm);
-      child.$mount(hydrating ? vnode.elm : undefined, hydrating);
+      child.$mount(hydrating ? vnode.elm : undefined, hydrating); // 就是 child.$mount(undefind, false)
     }
   },
 
@@ -4023,17 +4031,22 @@ var componentVNodeHooks = {
 var hooksToMerge = Object.keys(componentVNodeHooks);
 
 function createComponent (Ctor, data, context, children, tag) {
-  console.groupColor(undefined, 'create component start')
-  console.log('构造函数Ctor', Ctor)
+  // Ctor为定义组件时的配置
+
+  console.renderGroup('开始创建组件vnode')
+  console.log('组件传入的配置为：', Object.assign({}, Ctor))
 
   if (isUndef(Ctor)) {
     return
   }
 
+  // 这个baseCtor就是Vue的构造函数
+  // 在initGlobalAPI中做了如下赋值
+  // Vue.options._base = Vue
   var baseCtor = context.$options._base;
 
-  // plain options object: turn it into a constructor
   if (isObject(Ctor)) {
+    // 就是相当于执行了Vue.extend(Ctor)，构造了一个Vue的子类
     Ctor = baseCtor.extend(Ctor);
   }
 
@@ -4061,6 +4074,7 @@ function createComponent (Ctor, data, context, children, tag) {
 
   // resolve constructor options in case global mixins are applied after
   // component constructor creation
+  // 针对组件创建完了，应用全局Mixin的情况
   resolveConstructorOptions(Ctor);
 
   // transform component v-model data into props & events
@@ -4112,7 +4126,7 @@ function createComponent (Ctor, data, context, children, tag) {
   );
 
   console.log('生成的vnode', Object.assign({}, vnode))
-  console.groupEndColor(undefined, 'create component finish')
+  console.renderGroupEnd('创建组件vnode完成')
 
   return vnode
 }
@@ -4237,6 +4251,9 @@ function _createElement (context, tag, data, children, normalizationType) {
   }
   else {
     // direct component options / constructor
+    // 组件情况
+    // e.g. const compA = { data: ..., props: ... }
+    // render(h) { return h(compA) }
     vnode = createComponent(tag, data, context, children);
   }
 
@@ -4330,7 +4347,7 @@ function renderMixin (Vue) {
   };
 
   Vue.prototype._render = function () {
-    console.renderGroup('一个_render 方法将要执行')
+    console.renderGroup('vm._render方法开始执行')
 
     var vm = this;
     var ref = vm.$options;
@@ -4398,7 +4415,7 @@ function renderMixin (Vue) {
     // set parent
     vnode.parent = _parentVnode;
 
-    console.renderGroupEnd('一个_render 方法执行完成\n')
+    console.renderGroupEnd('vm._render方法执行完成\n')
     return vnode
   };
 }
@@ -4409,7 +4426,7 @@ var uid$3 = 0;
 function initMixin (Vue) {
   Vue.prototype._init = function (options) {
     // console.initGroup(undefined, '一个Vue实例初始化开始，' + (options._isComponent ? '组件' : 'Root节点'))
-    console.initGroup('一个Vue实例初始化开始')
+    console.initGroup('vm._init方法开始执行')
 
     var vm = this;
     // a uid
@@ -4476,7 +4493,7 @@ function initMixin (Vue) {
       vm.$mount(vm.$options.el);
     }
 
-    console.initGroupEnd('一个Vue实例初始结束')
+    console.initGroupEnd('vm._init方法执行完成')
     console.log('\n')
   };
 }
@@ -5353,7 +5370,6 @@ function createPatchFunction ({modules, nodeOps}) {
   var creatingElmInVPre = 0;
 
   function createElm (vnode, insertedVnodeQueue, parentElm, refElm, nested, ownerArray, index) {
-
     if (isDef(vnode.elm) && isDef(ownerArray)) {
       // This vnode was used in a previous render!
       // now it's used as a new node, overwriting its elm would cause
@@ -5366,8 +5382,7 @@ function createPatchFunction ({modules, nodeOps}) {
     vnode.isRootInsert = !nested; // for transition enter check
 
     // 检测vnode是否为组件vnode
-    if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
-      // 进入到这里，说明vnode是个组件vnode，且已经在上一步执行完组件的初始化、挂载过程
+    if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm) /* 进入到这里，说明vnode是个组件vnode, 执行组件的初始化、挂载过程 */) {
       return
     }
 
@@ -5396,6 +5411,7 @@ function createPatchFunction ({modules, nodeOps}) {
         invokeCreateHooks(vnode, insertedVnodeQueue);
       }
 
+      // 🔥 重要逻辑
       insert(parentElm, vnode.elm, refElm);
 
       if (process.env.NODE_ENV !== 'production' && data && data.pre) {
@@ -5416,13 +5432,15 @@ function createPatchFunction ({modules, nodeOps}) {
 
   function createComponent (vnode, insertedVnodeQueue, parentElm, refElm) {
     var i = vnode.data;
-    if (isDef(i)) { // 如果存在vnode.data, 证明是个组件，❓
+    if (isDef(i)) { // 如果存在vnode.data, 证明是个组件
       var isReactivated = isDef(vnode.componentInstance) && i.keepAlive;
 
       // i = i.hook
       // i = i.init
       // 此时的i即为vnode.data.hook.init, 即为组件extend的时候挂载的init方法
       if (isDef(i = i.hook) && isDef(i = i.init)) {
+        console.warn('父节点', parentElm)
+        console.warn('要插入其前面的节点', refElm)
         // 执行组件的init方法
         console.log(`patch时识别到一个组件： ${vnode.tag}，组件的_init方法将要执行。。。`)
         i(vnode, false /* hydrating */, parentElm, refElm);
@@ -5483,11 +5501,13 @@ function createPatchFunction ({modules, nodeOps}) {
 
   function insert (parent, elm, ref$$1) {
     if (isDef(parent)) {
+      // 如果存在后面节点就插入到后面节点之前
       if (isDef(ref$$1)) {
         if (ref$$1.parentNode === parent) {
           nodeOps.insertBefore(parent, elm, ref$$1);
         }
       }
+      // 否则就按顺序插入到parent后面
       else {
         nodeOps.appendChild(parent, elm);
       }
@@ -5502,7 +5522,8 @@ function createPatchFunction ({modules, nodeOps}) {
       for (var i = 0; i < children.length; ++i) {
         createElm(children[i], insertedVnodeQueue, vnode.elm, null, true, children, i);
       }
-    } else if (isPrimitive(vnode.text)) {
+    }
+    else if (isPrimitive(vnode.text)) {
       nodeOps.appendChild(vnode.elm, nodeOps.createTextNode(String(vnode.text)));
     }
   }
@@ -5765,11 +5786,11 @@ function createPatchFunction ({modules, nodeOps}) {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) { // children 发生了变化
-          console.groupColor('#9C9C9C', `vnode、tag is ${oldVnode.tag} updateChildren start   `)
+          console.updateGroup(`vnode、tag is ${oldVnode.tag} updateChildren start   `, '#9C9C9C')
 
           updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly);
 
-          console.groupEndColor('#9C9C9C', 'updateChildren end')
+          console.updateGroupEnd('updateChildren end', '#9C9C9C')
         }
       }
       else if (isDef(ch)) {
@@ -5928,7 +5949,7 @@ function createPatchFunction ({modules, nodeOps}) {
   }
 
   return function patch (oldVnode/* 首次挂载的时候，oldVnode是个DOM <div id="app"></div> */, vnode, hydrating, removeOnly, parentElm, refElm) {
-    console.groupColor(undefined, `patch start, tag: ${vnode.tag}`)
+    console.updateGroup(`patch开始, 当前patch的vnode标签为: ${vnode.tag}`)
 
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
@@ -5948,7 +5969,8 @@ function createPatchFunction ({modules, nodeOps}) {
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
         patchVnode(oldVnode, vnode, insertedVnodeQueue, removeOnly);
-      } else {
+      }
+      else {
         if (isRealElement) {
           // mounting to a real element
           // check if this is server-rendered content and if we can perform
@@ -6021,7 +6043,7 @@ function createPatchFunction ({modules, nodeOps}) {
     }
 
     invokeInsertHook(vnode, insertedVnodeQueue, isInitialPatch);
-    console.groupEndColor(undefined, 'patch end')
+    console.updateGroupEnd('patch结束')
     return vnode.elm
   }
 }
