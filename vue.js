@@ -4,59 +4,55 @@
  * Released under the MIT License.
  */
 
-// console相关变量
-const PROP_LOG = true
-const DATA_LOG = true
-
 console.object = function(obj) {
   console.log(Object.assign({}, obj))
 }
 
-console.groupProp = function(str) {
-  console.group(`%c${str}`, 'color:#fff;background:red;font-size:14px')
+const group = console.group
+const groupEnd = console.groupEnd
+
+// init console
+console.initGroup = (str, color = 'red') => {
+  if (!window.initConsoleControl) return
+  group(`%c${str}`, `color:#fff;background:${color};font-size:14px`)
 }
-console.groupEndProp = function(str) {
-  console.groupEnd()
-  console.log(`%c${str}`, 'color:#fff;background:red;font-size:14px;font-weight:700')
+console.initGroupEnd = (str, color = 'red') => {
+  if (!window.initConsoleControl) return
+  groupEnd()
+  console.log(`%c${str}`, `color:#fff;background:${color};font-size:14px;font-weight:700`)
 }
 
-console.groupMethod = function(str) {
-  console.group(`%c${str}`, 'color:#fff;background:green;font-size:14px')
+// parse console
+console.parseGroup = function(str, color = 'green') {
+  if (!window.parseConsoleControl) return
+  group(`%c${str}`, `color:#fff;background:${color};font-size:14px`)
 }
-console.groupEndMethod = function(str) {
-  console.groupEnd()
-  console.log(`%c${str}`, 'color:#fff;background:green;font-size:14px;font-weight:700')
-}
-
-console.groupData = function(str) {
-  console.group(`%c${str}`, 'color:#fff;background:orange;font-size:14px')
-}
-console.groupEndData = function(str) {
-  console.groupEnd()
-  console.log(`%c${str}`, 'color:#fff;background:orange;font-size:14px;font-weight:700')
+console.parseGroupEnd = function(str, color = 'green') {
+  if (!window.parseConsoleControl) return
+  groupEnd()
+  console.log(`%c${str}`, `color:#fff;background:${color};font-size:14px;font-weight:700`)
 }
 
-console.groupComputed = function(str) {
-  console.group(`%c${str}`, 'color:#fff;background:purple;font-size:14px')
+// render console
+console.renderGroup = function(str, color = 'pink') {
+  if (!window.renderConsoleControl) return
+  group(`%c${str}`, `color:#fff;background:${color};font-size:14px`)
 }
-console.groupEndComputed = function(str) {
-  console.groupEnd()
-  console.log(`%c${str}`, 'color:#fff;background:purple;font-size:14px;font-weight:700')
+console.renderGroupEnd = function(str, color = 'pink') {
+  if (!window.renderConsoleControl) return
+  groupEnd()
+  console.log(`%c${str}`, `color:#fff;background:${color};font-size:14px;font-weight:700`)
 }
 
-console.group_CreateElement= function(str) {
-  console.group(`%c${str}`, 'color:#fff;background:pink;font-size:14px')
+// update console
+console.updateGroup = function(str, color = '#ccc') {
+  if (!window.updateConsoleControl) return
+  group(`%c${str}`, `color:#fff;background:${color};font-size:14px`)
 }
-console.group_CreateElementEnd = function(str) {
-  console.groupEnd()
-  console.log(`%c${str}`, 'color:#fff;background:pink;font-size:14px;font-weight:700')
-}
-console.groupWatch= function(str) {
-  console.group(`%c${str}`, 'color:#fff;background:#8B4726;font-size:14px')
-}
-console.groupWatchEnd = function(str) {
-  console.groupEnd()
-  console.log(`%c${str}`, 'color:#fff;background:#8B4726;font-size:14px;font-weight:700')
+console.updateGroupEnd = function(str, color = '#ccc') {
+  if (!window.updateConsoleControl) return
+  groupEnd()
+  console.log(`%c${str}`, `color:#fff;background:${color};font-size:14px;font-weight:700`)
 }
 
 console.groupColor= function(color = 'red', str) {
@@ -2319,7 +2315,7 @@ function getFirstComponentChild (children) {
 
 
 function initEvents (vm) {
-  console.groupColor(undefined, `init enent start component name: ${vm.$options.name ? vm.$options.name : 'Root'}`)
+  console.initGroup(`初始化事件开始，组件名: ${vm.$options.name ? vm.$options.name : 'Root'}`)
 
   vm._events = Object.create(null);
   vm._hasHookEvent = false;
@@ -2330,7 +2326,7 @@ function initEvents (vm) {
     updateComponentListeners(vm, listeners);
   }
 
-  console.groupEndColor(undefined, 'init enent end')
+  console.initGroupEnd('初始化事件结束\n')
 }
 
 var target;
@@ -2554,7 +2550,8 @@ function initLifecycle (vm) {
 
 function lifecycleMixin (Vue) {
   Vue.prototype._update = function (vnode, hydrating) {
-    console.groupColor(undefined, '一个Vue实例的_update方法将要执行')
+    console.updateGroup('一个Vue实例的_update方法将要执行')
+
     var vm = this;
     if (vm._isMounted) {
       callHook(vm, 'beforeUpdate');
@@ -2589,7 +2586,7 @@ function lifecycleMixin (Vue) {
       vm.$parent.$el = vm.$el;
     }
 
-    console.groupEndColor(undefined, '一个Vue实例的_update方法执行完成')
+    console.updateGroupEnd('一个Vue实例的_update方法执行完成')
   };
 
   Vue.prototype.$forceUpdate = function () {
@@ -3213,7 +3210,7 @@ function initState (vm) {
 }
 
 function initProps (vm, propsOptions) {
-  console.groupProp('\nInit props start, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroup('初始化Props开始，组件名：' + (vm.$options.name ? vm.$options.name : 'Root'))
 
   // vm.$options.propsData 父组件传过来的props
   var propsData = vm.$options.propsData || {};
@@ -3264,11 +3261,11 @@ function initProps (vm, propsOptions) {
   for (var key in propsOptions) loop( key );
   toggleObserving(true);
 
-  console.groupEndProp('Init props finish, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroupEnd('初始化Props结束\n')
 }
 
 function initData (vm) {
-  console.groupData('\nInit data start, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroup('初始化Data开始, 组件名：')
 
   var data = vm.$options.data
   data = vm._data = typeof data === 'function' ? getData(data, vm) : (data || {})
@@ -3299,7 +3296,7 @@ function initData (vm) {
   // observe data
   observe(data, true /* asRootData */);
 
-  console.groupEndData('Init data finish, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroupEnd('初始化Data结束\n')
 }
 
 function getData (data, vm) {
@@ -3320,7 +3317,7 @@ function getData (data, vm) {
 var computedWatcherOptions = { lazy: true };
 
 function initComputed (vm, computed) {
-  console.groupComputed('Init computed start, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroup('初始化Computed开始，组件名：' + (vm.$options.name ? vm.$options.name : 'Root'))
 
   var watchers = vm._computedWatchers = Object.create(null);
 
@@ -3350,7 +3347,7 @@ function initComputed (vm, computed) {
     }
   }
 
-  console.groupEndComputed('Init computed finish, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroupEnd('初始化Computed结束\n')
 }
 
 function defineComputed (target, key, userDef) {
@@ -3391,7 +3388,7 @@ function createComputedGetter (key) {
 }
 
 function initMethods (vm, methods) {
-  console.groupMethod('\nInit methods start, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroup('初始化Methods开始，组件名：' + (vm.$options.name ? vm.$options.name : 'Root'))
 
   var props = vm.$options.props;
   for (var key in methods) {
@@ -3419,11 +3416,11 @@ function initMethods (vm, methods) {
     vm[key] = methods[key] == null ? noop : bind(methods[key], vm);
   }
 
-  console.groupEndMethod('Init methods finish, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroupEnd('初始化Methods结束\n')
 }
 
 function initWatch (vm, watch) {
-  console.groupWatch('Init watch start, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroup('初始化Watcher开始，组件名：' + (vm.$options.name ? vm.$options.name : 'Root'))
 
   for (var key in watch) {
     var handler = watch[key];
@@ -3436,7 +3433,7 @@ function initWatch (vm, watch) {
     }
   }
 
-  console.groupWatchEnd('Init watch finish, component name: ' + (vm.$options.name ? vm.$options.name : 'Root'))
+  console.initGroupEnd('初始化Watcher结束')
 }
 
 function createWatcher (vm, expOrFn, handler, options) {
@@ -4180,7 +4177,7 @@ function createElement (context, tag, data, children, normalizationType, alwaysN
 
 function _createElement (context, tag, data, children, normalizationType) {
   const type = typeof tag === 'object' ? '组件' : 'HTML标签'
-  console.group_CreateElement(`一个创建vnode过程开始：这是一个${type}，${type}名：${type === '组件' ? tag.name : tag}   `)
+  console.renderGroup(`一个创建vnode过程开始：这是一个${type}，${type}名：${type === '组件' ? tag.name : tag}   `)
 
   if (isDef(data) && isDef((data).__ob__)) {
     // 使用被观察过的对象作为vnode的data， waring
@@ -4243,7 +4240,7 @@ function _createElement (context, tag, data, children, normalizationType) {
     vnode = createComponent(tag, data, context, children);
   }
 
-  console.group_CreateElementEnd('一个创建vnode过程结束')
+  console.renderGroupEnd('一个创建vnode过程结束')
 
   if (Array.isArray(vnode)) {
     return vnode
@@ -4333,7 +4330,7 @@ function renderMixin (Vue) {
   };
 
   Vue.prototype._render = function () {
-    console.groupColor(undefined, '一个_render 方法将要执行')
+    console.renderGroup('一个_render 方法将要执行')
 
     var vm = this;
     var ref = vm.$options;
@@ -4401,7 +4398,7 @@ function renderMixin (Vue) {
     // set parent
     vnode.parent = _parentVnode;
 
-    console.groupEndColor(undefined, '一个_render 方法执行完成\n')
+    console.renderGroupEnd('一个_render 方法执行完成\n')
     return vnode
   };
 }
@@ -4411,8 +4408,8 @@ var uid$3 = 0;
 
 function initMixin (Vue) {
   Vue.prototype._init = function (options) {
-    // console.groupColor(undefined, '一个Vue实例初始化开始，' + (options._isComponent ? '组件' : 'Root节点'))
-    console.groupColor(undefined, '一个Vue实例初始化开始')
+    // console.initGroup(undefined, '一个Vue实例初始化开始，' + (options._isComponent ? '组件' : 'Root节点'))
+    console.initGroup('一个Vue实例初始化开始')
 
     var vm = this;
     // a uid
@@ -4434,21 +4431,21 @@ function initMixin (Vue) {
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
 
-      console.groupColor(undefined, '组件的合并配置开始');
+      console.initGroup('组件的合并配置开始');
 
       console.log(Object.assign({}, options))
       initInternalComponent(vm, options);
 
-      console.groupEndColor(undefined, '组件的合并配置结束');
+      console.initGroupEnd('组件的合并配置结束');
     }
     else {
-      console.groupColor(undefined, '根组件的合并配置开始');
+      console.initGroup('根组件的合并配置开始');
 
       // vm.constructor就是Vue类
       // options就是new Vue中传入的对象 e.g. {template: `<div>{{a}}</div>`, data: { a: 1 }}
       vm.$options = mergeOptions(resolveConstructorOptions(vm.constructor), options || {}, vm);
 
-      console.groupEndColor(undefined, '根组件的合并配置结束');
+      console.initGroupEnd('根组件的合并配置结束\n');
     }
 
     if (process.env.NODE_ENV !== 'production') {
@@ -4479,7 +4476,7 @@ function initMixin (Vue) {
       vm.$mount(vm.$options.el);
     }
 
-    console.groupEndColor(undefined, '一个Vue实例初始结束')
+    console.initGroupEnd('一个Vue实例初始结束')
     console.log('\n')
   };
 }
@@ -8530,7 +8527,7 @@ function decodeAttr (value, shouldDecodeNewlines) {
 }
 
 function parseHTML (html, options) {
-  console.groupColor('#ccc', 'parseHTML方法开始');
+  console.parseGroup('parseHTML方法开始', '#ccc');
 
   var stack = [];
 
@@ -8656,7 +8653,7 @@ function parseHTML (html, options) {
   // Clean up any remaining tags
   parseEndTag();
 
-  console.groupEndColor('#ccc', 'parseHTML方法结束');
+  console.parseGroupEnd('parseHTML方法结束', '#ccc');
 
   function advance (n) {
     index += n;
@@ -8821,7 +8818,7 @@ function createASTElement (tag, attrs, parent) {
 
 // parse输入的是template、options，输出的是AST的根节点
 function parse (template, options) {
-  console.groupColor('#ccc', '解析template模版开始');
+  console.parseGroup('解析template模版开始', '#ccc');
 
   warn$2 = options.warn || baseWarn;
 
@@ -9016,7 +9013,7 @@ function parse (template, options) {
     }
   });
 
-  console.groupEndColor('#ccc', '解析template模版结束，生成的AST为：');
+  console.parseGroupEnd('解析template模版结束，生成的AST为：', '#ccc');
   console.log(root)
   return root
 }
@@ -10468,21 +10465,21 @@ function createCompilerCreator (baseCompile) {
 // Here we just export a default compiler using the default parts.
 var createCompiler = createCompilerCreator(function baseCompile (template, options) {
   // 1、解析template，生成AST语法树
-  console.groupColor('orange', '编译第一阶段，解析template，生成AST语法树')
+  console.parseGroup('编译第一阶段，解析template，生成AST语法树', 'orange')
   var ast = parse(template.trim(), options);
-  console.groupEndColor('orange', '编译第一阶段结束')
+  console.parseGroupEnd('编译第一阶段结束', 'orange')
 
   // 2、优化AST语法树
-  console.groupColor('red','编译第二阶段，优化AST语法树')
+  console.parseGroup('编译第二阶段，优化AST语法树', 'red')
   if (options.optimize !== false) {
     optimize(ast, options);
   }
-  console.groupEndColor('red', '编译第二阶段结束')
+  console.parseGroupEnd('编译第二阶段结束', 'red')
 
   // 3、生成render函数
-  console.groupColor('blue', '编译第三阶段，generate，生成render函数')
+  console.parseGroup('编译第三阶段，generate，生成render函数', 'blue')
   var code = generate(ast, options);
-  console.groupEndColor('blue', '编译第三阶段结束\n\n')
+  console.parseGroupEnd('编译第三阶段结束\n\n', 'blue')
 
   console.warn(code.render)
   return { ast: ast, render: code.render, staticRenderFns: code.staticRenderFns }

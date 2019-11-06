@@ -23,14 +23,24 @@
         background-color: #fff;
       }
     </style>
+    <script>
+        const stateKeyMap = ['init', 'parse', 'render', 'update']
+
+        stateKeyMap.map((stateKey, index) => {
+          // 初始化数据
+          const stateVal = parseInt(localStorage.getItem(stateKey)) || 0
+          window[stateKey + 'ConsoleControl'] = stateVal
+        })
+    </script>
   </head>
   <body>
     <h2>vue内容区</h2>
     <div class="vue-container">
         <div id="app">APP节点</div>
-        <p>APP后的节点</p>
-        <div id="app2">APP2节点</div>
+        <!-- <p>APP后的节点</p> -->
+        <!-- <div id="app2">APP2节点</div> -->
     </div>
+
     <h2>控制区</h2>
     <div class="ctol-container">
       <p>
@@ -52,29 +62,25 @@
     </div>
   </body>
 
-<script>
-  const textMap = ['关', '开']
-  const stateBtnGroup = document.querySelectorAll('.ctol-container button')
-  const stateTextGroup = document.querySelectorAll('.ctol-container span')
+  <script>
+      const textMap = ['关', '开']
+      const stateBtnGroup = document.querySelectorAll('.ctol-container button')
+      const stateTextGroup = document.querySelectorAll('.ctol-container span')
 
-  function init() {
-    ['init', 'parse', 'render', 'update'].map((stateKey, index) => {
-      // 初始化数据
-      const stateVal = parseInt(localStorage.getItem(stateKey)) || 0
-      const stateText = stateTextGroup[index]
-      stateText.innerHTML = textMap[stateVal]
+      stateKeyMap.map((stateKey, index) => {
+        // 初始化数据
+        const stateVal = parseInt(localStorage.getItem(stateKey)) || 0
+        const stateText = stateTextGroup[index]
+        stateText.innerHTML = textMap[stateVal]
 
-      // 绑定事件
-      const stateBtn = stateBtnGroup[index]
-      stateBtn.addEventListener('click', () => {
-        const currentStateVal = parseInt(localStorage.getItem(stateKey)) || 0
-        const newStateVal = +!currentStateVal
-        localStorage.setItem(stateKey, newStateVal)
-        window.location.reload()
+        // 绑定事件
+        const stateBtn = stateBtnGroup[index]
+        stateBtn.addEventListener('click', () => {
+          const currentStateVal = parseInt(localStorage.getItem(stateKey)) || 0
+          const newStateVal = +!currentStateVal
+          localStorage.setItem(stateKey, newStateVal)
+          window.location.reload()
+        })
       })
-    })
-  }
-
-  init()
-</script>
+  </script>
 </html>
