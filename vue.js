@@ -5412,6 +5412,7 @@ function createPatchFunction ({modules, nodeOps}) {
       }
 
       // 🔥 重要逻辑
+      // parentElm, vnode.elm, refElm均为真实节点
       insert(parentElm, vnode.elm, refElm);
 
       if (process.env.NODE_ENV !== 'production' && data && data.pre) {
