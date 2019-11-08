@@ -219,6 +219,8 @@ const childVue = Vue.extend({
 //   }
 // }).$mount('#app2')
 
+window.parentData = 3333
+
 const componentWithPorps = {
   name: 'componentWithPorps',
 
@@ -242,13 +244,13 @@ const rootVm = new Vue({
 
   render(h) {
     return h('div', [
-      h(componentWithPorps, {props: {parentData: this.a}}),
+      h(componentWithPorps, {props: {parentData: window.parentData}}),
       h(componentWithPorps, {props: {parentData: this.b}})
     ])
   },
 
   data: {
-    a: 1,
+    // a: 1,
     b: 2
   },
 
