@@ -1544,11 +1544,8 @@ function validateProp (key, propOptions, propsData, vm) {
     observe(value);
     toggleObserving(prevShouldObserve);
   }
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    // skip validation for weex recycle-list child component props
-    !(false && isObject(value) && ('@binding' in value))
-  ) {
+
+  if (process.env.NODE_ENV !== 'production' && !(false && isObject(value) && ('@binding' in value))) {
     assertProp(prop, key, value, vm, absent);
   }
 
@@ -2061,10 +2058,18 @@ function extractPropsFromVNodeData (data, Ctor, tag) {
   // we are only extracting raw values here.
   // validation and default values are handled in the child
   // component itself.
+
+  // 组件的propOption
+  // e.g.
+  // {
+  //   type: Number,
+  //   required: true
+  // }
   var propOptions = Ctor.options.props;
   if (isUndef(propOptions)) {
     return
   }
+
   var res = {};
   var attrs = data.attrs;
   var props = data.props;
@@ -2077,10 +2082,11 @@ function extractPropsFromVNodeData (data, Ctor, tag) {
           tip("Prop \"" + keyInLowerCase + "\" is passed to component " + (formatComponentName(tag || Ctor)) + ", but the declared prop name is" + " \"" + key + "\". " + "Note that HTML attributes are case-insensitive and camelCased " + "props need to use their kebab-case equivalents when using in-DOM " + "templates. You should probably use \"" + altKey + "\" instead of \"" + key + "\".");
         }
       }
-      checkProp(res, props, key, altKey, true) ||
-      checkProp(res, attrs, key, altKey, false);
+
+      checkProp(res, props, key, altKey, true) || checkProp(res, attrs, key, altKey, false);
     }
   }
+
   return res
 }
 
@@ -3230,33 +3236,34 @@ function initProps (vm, propsOptions) {
   if (!isRoot) {
     toggleObserving(false);
   }
-  var loop = function ( key ) {
+
+  var loop = function (key) {
     keys.push(key);
     var value = validateProp(key, propsOptions, propsData, vm);
-    /* istanbul ignore else */
+
     if (process.env.NODE_ENV !== 'production') {
       var hyphenatedKey = hyphenate(key);
-      if (isReservedAttribute(hyphenatedKey) ||
-          config.isReservedAttr(hyphenatedKey)) {
-        warn(
-          ("\"" + hyphenatedKey + "\" is a reserved attribute and cannot be used as component prop."),
-          vm
-        );
+
+      if (isReservedAttribute(hyphenatedKey) || config.isReservedAttr(hyphenatedKey)) {
+        warn(("\"" + hyphenatedKey + "\" is a reserved attribute and cannot be used as component prop."),vm);
       }
+
       defineReactive(props, key, value, function () {
         if (vm.$parent && !isUpdatingChildComponent) {
-          warn(
-            "Avoid mutating a prop directly since the value will be " +
-            "overwritten whenever the parent component re-renders. " +
-            "Instead, use a data or computed property based on the prop's " +
-            "value. Prop being mutated: \"" + key + "\"",
-            vm
-          );
+          warn("Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders. Instead, use a data or computed property based on the prop's value. Prop being mutated: \"" + key + "\"", vm);
         }
       });
-    } else {
+
+      // 🐸 自己test
+      // defineReactive(props, key, value, function() {
+      //   console.error('你触发了props的改动，不建议对props进行改动～～👎')
+      //   props[key] = value
+      // })
+    }
+    else {
       defineReactive(props, key, value);
     }
+
     // static props are already proxied on the component's prototype
     // during Vue.extend(). We only need to proxy props defined at
     // instantiation here.
@@ -3266,6 +3273,7 @@ function initProps (vm, propsOptions) {
   };
 
   for (var key in propsOptions) loop( key );
+
   toggleObserving(true);
 
   console.initGroupEnd('初始化Props结束\n')
@@ -5382,12 +5390,14 @@ function createPatchFunction ({modules, nodeOps}) {
     vnode.isRootInsert = !nested; // for transition enter check
 
     // 检测vnode是否为组件vnode
-    if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm) /* 进入到这里，说明vnode是个组件vnode, 执行组件的初始化、挂载过程 */) {
+    if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
+      /* 进入到这里，说明vnode是个组件vnode, 执行组件的初始化、挂载过程 */
       return
     }
 
     // 不是组件vnode
     const { data, children, tag } = vnode;
+    // 带标签的vnode，div、span、p等等
     if (isDef(tag)) {
 
       if (process.env.NODE_ENV !== 'production') {
@@ -5402,9 +5412,11 @@ function createPatchFunction ({modules, nodeOps}) {
       vnode.elm = vnode.ns ? nodeOps.createElementNS(vnode.ns, tag) : nodeOps.createElement(tag, vnode);
       setScope(vnode);
 
-      console.log('开始创建vnode的children')
+      console.updateGroup(`开始创建${vnode.tag}标签的子节点`)
+      // 🔥 重要逻辑
       // createChildren逻辑就是遍历children，对每个children执行createElm方法
       createChildren(vnode, children, insertedVnodeQueue);
+      console.updateGroupEnd(`${vnode.tag}标签的子节点创建完成`)
 
       // staticClass、attr、on等
       if (isDef(data)) {
@@ -5420,12 +5432,15 @@ function createPatchFunction ({modules, nodeOps}) {
       }
 
     }
+    // 注释vnode
     else if (isTrue(vnode.isComment)) {
+      console.warn('该子节点是个注释节点，内容：', vnode.text)
       vnode.elm = nodeOps.createComment(vnode.text);
       insert(parentElm, vnode.elm, refElm);
     }
+    // 文本vnode
     else {
-      console.warn('is text!', vnode.text)
+      console.warn('该子节点是个文本节点，内容：', vnode.text)
       vnode.elm = nodeOps.createTextNode(vnode.text);
       insert(parentElm, vnode.elm, refElm);
     }
@@ -5787,11 +5802,11 @@ function createPatchFunction ({modules, nodeOps}) {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) { // children 发生了变化
-          console.updateGroup(`vnode、tag is ${oldVnode.tag} updateChildren start   `, '#9C9C9C')
+          console.updateGroup(`${oldVnode.tag}标签的子节点开始更新`, '#9C9C9C')
 
           updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly);
 
-          console.updateGroupEnd('updateChildren end', '#9C9C9C')
+          console.updateGroupEnd('子节点更新完成', '#9C9C9C')
         }
       }
       else if (isDef(ch)) {
@@ -5808,13 +5823,13 @@ function createPatchFunction ({modules, nodeOps}) {
       }
     }
     else if (oldVnode.text !== vnode.text) {
-      // text更新
-      console.log('text update!')
+      // dom中的innerText更新
+      console.warn(`待更新的子节点是个text节点，旧的text：'${oldVnode.text}'，新的text：'${vnode.text}'`)
       nodeOps.setTextContent(elm, vnode.text);
     }
     else {
       // 更新前的vnode children为text，且更新后的vnode children也为text，且text相同
-      console.log('text not update!')
+      console.log('text not change!')
     }
 
     if (isDef(data)) {

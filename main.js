@@ -219,48 +219,43 @@ const childVue = Vue.extend({
 //   }
 // }).$mount('#app2')
 
+const componentWithPorps = {
+  name: 'componentWithPorps',
+
+  props: {
+    parentData: [Number, String]
+  },
+
+  render(h) {
+    return h('article', {
+      class: 'component'
+    }, this.parentData)
+  }
+}
+
 const rootVm = new Vue({
   components: {
   },
-
-  template: `<p>{{numSecond}}<button @click="add">add</button>{{numThird}}</p>`,
 
   props: {
   },
 
   render(h) {
-    return h('p', {
-      class: 'test'
-    }, [
-      h(eventComponent, {
-        on: {
-          select: () => {
-            console.log(1111)
-          }
-        }
-      })
+    return h('div', [
+      h(componentWithPorps, {props: {parentData: this.a}}),
+      h(componentWithPorps, {props: {parentData: this.b}})
     ])
   },
 
   data: {
-    num: 0
+    a: 1,
+    b: 2
   },
 
   filters: {
   },
 
   computed: {
-    numFirst() {
-      return 'first, ' + this.num
-    },
-
-    numSecond() {
-      return 'second,' + this.numFirst
-    },
-
-    numThird() {
-      return 'third, ' + this.num
-    }
   },
 
   watch: {
@@ -277,5 +272,5 @@ rootVm.$mount('#app')
 
 window.Vue = Vue
 window.vm = rootVm
+window.child = rootVm.$children[0]
 // window.store = store
-window.childVue = childVue
