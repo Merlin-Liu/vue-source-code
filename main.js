@@ -19,8 +19,8 @@ const Bar = { template: '<div>bar</div>' }
 // 通过 Vue.extend() 创建的组件构造器，
 // 或者，只是一个组件配置对象。
 const routes = [
-  { path: '/foo', component: Foo },
-  { path: '/bar', component: Bar }
+  { name: 'foo', path: '/foo', component: Foo },
+  { name: 'bar', path: '/bar', component: Bar }
 ]
 
 const router = new VueRouter({routes})
@@ -260,8 +260,7 @@ const rootVm = new Vue({
   },
 
   template: `
-<div id="app">
-  <h1>Hello App!</h1>
+<div>
   <p>
     <router-link to="/foo">Go to Foo</router-link>
     <router-link to="/bar">Go to Bar</router-link>

@@ -398,11 +398,7 @@ function queryIncludes (current, target) {
 
 /*  */
 
-function resolvePath (
-  relative,
-  base,
-  append
-) {
+function resolvePath (relative, base, append) {
   var firstChar = relative.charAt(0);
   if (firstChar === '/') {
     return relative
@@ -1244,24 +1240,17 @@ var inBrowser = typeof window !== 'undefined';
 
 /*  */
 
-function createRouteMap (
-  routes,
-  oldPathList,
-  oldPathMap,
-  oldNameMap
-) {
+function createRouteMap (routes, oldPathList, oldPathMap, oldNameMap) {
   // the path list is used to control path matching priority
   var pathList = oldPathList || [];
-  // $flow-disable-line
   var pathMap = oldPathMap || Object.create(null);
-  // $flow-disable-line
   var nameMap = oldNameMap || Object.create(null);
 
   routes.forEach(function (route) {
     addRouteRecord(pathList, pathMap, nameMap, route);
   });
 
-  // ensure wildcard routes are always at the end
+  // 确保通配符路由始终位于末尾
   for (var i = 0, l = pathList.length; i < l; i++) {
     if (pathList[i] === '*') {
       pathList.push(pathList.splice(i, 1)[0]);
@@ -1277,7 +1266,9 @@ function createRouteMap (
       .filter(function (path) { return path && path.charAt(0) !== '*' && path.charAt(0) !== '/'; });
 
     if (found.length > 0) {
-      var pathNames = found.map(function (path) { return ("- " + path); }).join('\n');
+      var pathNames = found.map(function (path) {
+        return ("- " + path);
+      }).join('\n');
       warn(false, ("Non-nested routes must include a leading slash character. Fix the following routes: \n" + pathNames));
     }
   }
@@ -1289,28 +1280,16 @@ function createRouteMap (
   }
 }
 
-function addRouteRecord (
-  pathList,
-  pathMap,
-  nameMap,
-  route,
-  parent,
-  matchAs
-) {
+function addRouteRecord (pathList, pathMap, nameMap, route, parent, matchAs) {
   var path = route.path;
   var name = route.name;
+
   if (process.env.NODE_ENV !== 'production') {
     assert(path != null, "\"path\" is required in a route configuration.");
-    assert(
-      typeof route.component !== 'string',
-      "route config \"component\" for path: " + (String(
-        path || name
-      )) + " cannot be a " + "string id. Use an actual component instead."
-    );
+    assert(typeof route.component !== 'string', "route config \"component\" for path: " + (String(path || name)) + " cannot be a " + "string id. Use an actual component instead.");
   }
 
-  var pathToRegexpOptions =
-    route.pathToRegexpOptions || {};
+  var pathToRegexpOptions = route.pathToRegexpOptions || {};
   var normalizedPath = normalizePath(path, parent, pathToRegexpOptions.strict);
 
   if (typeof route.caseSensitive === 'boolean') {
@@ -1346,20 +1325,11 @@ function addRouteRecord (
         !route.redirect &&
         route.children.some(function (child) { return /^\/?$/.test(child.path); })
       ) {
-        warn(
-          false,
-          "Named Route '" + (route.name) + "' has a default child route. " +
-            "When navigating to this named route (:to=\"{name: '" + (route.name) + "'\"), " +
-            "the default child route will not be rendered. Remove the name from " +
-            "this route and use the name of the default child route for named " +
-            "links instead."
-        );
+        warn(false ,"Named Route '" + (route.name) + "' has a default child route. When navigating to this named route (:to=\"{name: '" + (route.name) + "'\"), the default child route will not be rendered. Remove the name from this route and use the name of the default child route for named links instead.");
       }
     }
     route.children.forEach(function (child) {
-      var childMatchAs = matchAs
-        ? cleanPath((matchAs + "/" + (child.path)))
-        : undefined;
+      var childMatchAs = matchAs ? cleanPath((matchAs + "/" + (child.path))) : undefined;
       addRouteRecord(pathList, pathMap, nameMap, child, record, childMatchAs);
     });
   }
@@ -1374,10 +1344,7 @@ function addRouteRecord (
     for (var i = 0; i < aliases.length; ++i) {
       var alias = aliases[i];
       if (process.env.NODE_ENV !== 'production' && alias === path) {
-        warn(
-          false,
-          ("Found an alias with the same value as the path: \"" + path + "\". You have to remove that alias. It will be ignored in development.")
-        );
+        warn(false, ("Found an alias with the same value as the path: \"" + path + "\". You have to remove that alias. It will be ignored in development."));
         // skip in dev to make it work
         continue
       }
@@ -1400,20 +1367,14 @@ function addRouteRecord (
   if (name) {
     if (!nameMap[name]) {
       nameMap[name] = record;
-    } else if (process.env.NODE_ENV !== 'production' && !matchAs) {
-      warn(
-        false,
-        "Duplicate named routes definition: " +
-          "{ name: \"" + name + "\", path: \"" + (record.path) + "\" }"
-      );
+    }
+    else if (process.env.NODE_ENV !== 'production' && !matchAs) {
+      warn(false, "Duplicate named routes definition: { name: \"" + name + "\", path: \"" + (record.path) + "\" }");
     }
   }
 }
 
-function compileRouteRegex (
-  path,
-  pathToRegexpOptions
-) {
+function compileRouteRegex (path, pathToRegexpOptions) {
   var regex = pathToRegexp_1(path, [], pathToRegexpOptions);
   if (process.env.NODE_ENV !== 'production') {
     var keys = Object.create(null);
@@ -1443,10 +1404,7 @@ function normalizePath (
 
 
 
-function createMatcher (
-  routes,
-  router
-) {
+function createMatcher (routes, router) {
   var ref = createRouteMap(routes);
   var pathList = ref.pathList;
   var pathMap = ref.pathMap;
@@ -2033,12 +1991,8 @@ History.prototype.onError = function onError (errorCb) {
   this.errorCbs.push(errorCb);
 };
 
-History.prototype.transitionTo = function transitionTo (
-  location,
-  onComplete,
-  onAbort
-) {
-    var this$1 = this;
+History.prototype.transitionTo = function transitionTo (location, onComplete, onAbort) {
+  var this$1 = this;
 
   var route = this.router.match(location, this.current);
   this.confirmTransition(
@@ -2701,11 +2655,12 @@ prototypeAccessors.currentRoute.get = function () {
   return this.history && this.history.current
 };
 
-VueRouter.prototype.init = function init (app /* Vue component instance */) {
+VueRouter.prototype.init = function init (app /* 是一个vue实例 */) {
     var this$1 = this;
-
+  // 未use vueRouter
   process.env.NODE_ENV !== 'production' && assert(install.installed, "not installed. Make sure to call `Vue.use(VueRouter)` before creating root instance.");
 
+  // 只有根 vue 实例会保存到 this.apps 中
   this.apps.push(app);
 
   // set up app destroyed handler
