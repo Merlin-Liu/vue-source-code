@@ -2393,23 +2393,24 @@ var HashHistory = /*@__PURE__*/(function (History) {
       setupScroll();
     }
 
-    window.addEventListener(
-      supportsPushState ? 'popstate' : 'hashchange',
-      function () {
-        var current = this$1.current;
-        if (!ensureSlash()) {
-          return
-        }
-        this$1.transitionTo(getHash(), function (route) {
-          if (supportsScroll) {
-            handleScroll(this$1.router, route, current, true);
-          }
-          if (!supportsPushState) {
-            replaceHash(route.fullPath);
-          }
-        });
+    window.addEventListener(supportsPushState ? 'popstate' : 'hashchange', function () {
+      var current = this$1.current;
+
+      if (!ensureSlash()) {
+        return
       }
-    );
+
+      this$1.transitionTo(getHash(), function (route) {
+        if (supportsScroll) {
+          handleScroll(this$1.router, route, current, true);
+        }
+
+        if (!supportsPushState) {
+          replaceHash(route.fullPath);
+        }
+      });
+
+    });
   };
 
   HashHistory.prototype.push = function push (location, onComplete, onAbort) {

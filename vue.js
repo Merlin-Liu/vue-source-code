@@ -4095,6 +4095,7 @@ function createComponent (Ctor, data, context, children, tag) {
 
   // functional component
   if (isTrue(Ctor.options.functional)) {
+    console.renderGroupEnd('创建组件vnode完成，这是一个函数式组件')
     return createFunctionalComponent(Ctor, propsData, data, context, children)
   }
 
@@ -5802,7 +5803,8 @@ function createPatchFunction ({modules, nodeOps}) {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) { // children 发生了变化
-          console.updateGroup(`${oldVnode.tag}标签的子节点开始更新`, '#9C9C9C')
+          // console.updateGroup(`${oldVnode.tag}标签的子节点开始更新`, '#9C9C9C')
+          console.updateGroup(`标签的子节点开始更新`, '#9C9C9C')
 
           updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly);
 
@@ -5965,12 +5967,12 @@ function createPatchFunction ({modules, nodeOps}) {
   }
 
   return function patch (oldVnode/* 首次挂载的时候，oldVnode是个DOM <div id="app"></div> */, vnode, hydrating, removeOnly, parentElm, refElm) {
-    console.updateGroup(`patch开始, 当前patch的vnode标签为: ${vnode ? vnode.tag : 'null'}`)
-
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
       return
     }
+
+    console.updateGroup(`patch开始, 当前patch的vnode标签为: ${vnode ? vnode.tag : 'null'}`)
 
     var isInitialPatch = false;
     var insertedVnodeQueue = [];
