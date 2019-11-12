@@ -25,7 +25,6 @@ const routes = [
 
 const router = new VueRouter({routes})
 
-
 // const store = new Vuex.Store({
 //   state: {
 //     count: {
@@ -41,6 +40,7 @@ const router = new VueRouter({routes})
 //   },
 //   strict: 1
 // })
+
 
 const handleClick = function () {
   alert('click')
@@ -240,7 +240,6 @@ const childVue = Vue.extend({
 //   }
 // }).$mount('#app2')
 
-
 const componentWithPorps = {
   name: 'componentWithPorps',
 
@@ -255,29 +254,41 @@ const componentWithPorps = {
   }
 }
 
+
+// rootVm
+/* ------------------------------------------------------------------------------------------------ */
 const rootVm = new Vue({
   components: {
   },
 
-  template: `
-<div>
-  <p>
-    <router-link to="/foo">Go to Foo</router-link>
-    <router-link to="/bar">Go to Bar</router-link>
-  </p>
-  <router-view></router-view>
-</div>`,
+//   template: `
+// <div>
+//   <p>
+//     <router-link to="/foo">Go to Foo</router-link>
+//     <router-link to="/bar">Go to Bar</router-link>
+//   </p>
+//   <router-view></router-view>
+// </div>`,
+
+  render(h) {
+    return h('p', [this.num, this.textWord])
+  },
 
   props: {
   },
 
   data: {
+    num: 0,
+    text: 'text'
   },
 
   filters: {
   },
 
   computed: {
+    textWord () {
+      return this.text + ', computed'
+    }
   },
 
   watch: {
@@ -286,15 +297,22 @@ const rootVm = new Vue({
   methods: {
   },
 
-  router,
+  // router,
 
   // store
 })
 
 // 挂载
 rootVm.$mount('#app')
+/* ------------------------------------------------------------------------------------------------ */
 
 window.Vue = Vue
 window.vm = rootVm
 window.child = rootVm.$children[0]
 // window.store = store
+
+window.change = function () {
+    rootVm.num += 1
+
+    rootVm.text += '!'
+}

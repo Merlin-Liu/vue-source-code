@@ -1792,22 +1792,27 @@ function withMacroTask (fn) {
 
 function nextTick (cb, ctx) {
   var _resolve;
+
   callbacks.push(function () {
     if (cb) {
       try {
         cb.call(ctx);
-      } catch (e) {
+      }
+      catch (e) {
         handleError(e, ctx, 'nextTick');
       }
-    } else if (_resolve) {
+    }
+    else if (_resolve) {
       _resolve(ctx);
     }
   });
+
   if (!pending) {
     pending = true;
     if (useMacroTask) {
       macroTimerFunc();
-    } else {
+    }
+    else {
       microTimerFunc();
     }
   }
@@ -2877,7 +2882,9 @@ function flushSchedulerQueue () {
   //    user watchers are created before the render watcher)
   // 3. If a component is destroyed during a parent component's watcher run,
   //    its watchers can be skipped.
-  queue.sort(function (a, b) { return a.id - b.id; });
+  queue.sort(function (a, b) {
+    return a.id - b.id;
+  });
 
   // do not cache length because more watchers might be pushed
   // as we run existing watchers
@@ -2889,6 +2896,7 @@ function flushSchedulerQueue () {
     // in dev build, check and stop circular updates.
     if (process.env.NODE_ENV !== 'production' && has[id] != null) {
       circular[id] = (circular[id] || 0) + 1;
+
       if (circular[id] > MAX_UPDATE_COUNT) {
         warn('You may have an infinite update loop ' + (watcher.user ? ("in watcher with expression \"" + (watcher.expression) + "\"") : "in a component render function."), watcher.vm);
         break
@@ -2949,7 +2957,7 @@ function callActivatedHooks (queue) {
  */
 function queueWatcher (watcher) {
   var id = watcher.id;
-  console.warn('queue Watcher!')
+
   if (has[id] == null) {
     has[id] = true;
     if (!flushing) {
@@ -2964,10 +2972,10 @@ function queueWatcher (watcher) {
       }
       queue.splice(i + 1, 0, watcher);
     }
+
     // queue the flush
     if (!waiting) {
       waiting = true;
-      // console.warn('queue Watcher!')
       nextTick(flushSchedulerQueue);
     }
   }
