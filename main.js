@@ -1,9 +1,30 @@
 // 拷贝的vue源码，即./node_modules/vue/dist/vue.esm.js
 import Vue from './vue'
+// 拷贝的vueRouter源码，即./node_modules/vue-router/dist/vue-router.esm.js
+import VueRouter from './vue-router'
 // 拷贝的vuex源码，即./node_modules/vuex/dist/vuex.esm.js
 import Vuex from './vuex'
 
+
+Vue.use(VueRouter)
 // Vue.use(Vuex)
+
+// 1. 定义（路由）组件。
+// 可以从其他文件 import 进来
+const Foo = { template: '<div>foo</div>' }
+const Bar = { template: '<div>bar</div>' }
+
+// 2. 定义路由
+// 每个路由应该映射一个组件。 其中"component" 可以是
+// 通过 Vue.extend() 创建的组件构造器，
+// 或者，只是一个组件配置对象。
+const routes = [
+  { path: '/foo', component: Foo },
+  { path: '/bar', component: Bar }
+]
+
+const router = new VueRouter({routes})
+
 
 // const store = new Vuex.Store({
 //   state: {
@@ -219,7 +240,6 @@ const childVue = Vue.extend({
 //   }
 // }).$mount('#app2')
 
-window.parentData = 3333
 
 const componentWithPorps = {
   name: 'componentWithPorps',
@@ -239,19 +259,20 @@ const rootVm = new Vue({
   components: {
   },
 
+  template: `
+<div id="app">
+  <h1>Hello App!</h1>
+  <p>
+    <router-link to="/foo">Go to Foo</router-link>
+    <router-link to="/bar">Go to Bar</router-link>
+  </p>
+  <router-view></router-view>
+</div>`,
+
   props: {
   },
 
-  render(h) {
-    return h('div', [
-      h(componentWithPorps, {props: {parentData: window.parentData}}),
-      h(componentWithPorps, {props: {parentData: this.b}})
-    ])
-  },
-
   data: {
-    // a: 1,
-    b: 2
   },
 
   filters: {
@@ -265,6 +286,8 @@ const rootVm = new Vue({
 
   methods: {
   },
+
+  router,
 
   // store
 })

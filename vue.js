@@ -5965,7 +5965,7 @@ function createPatchFunction ({modules, nodeOps}) {
   }
 
   return function patch (oldVnode/* 首次挂载的时候，oldVnode是个DOM <div id="app"></div> */, vnode, hydrating, removeOnly, parentElm, refElm) {
-    console.updateGroup(`patch开始, 当前patch的vnode标签为: ${vnode.tag}`)
+    console.updateGroup(`patch开始, 当前patch的vnode标签为: ${vnode ? vnode.tag : 'null'}`)
 
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
