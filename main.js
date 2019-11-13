@@ -271,7 +271,9 @@ const rootVm = new Vue({
 // </div>`,
 
   render(h) {
-    return h('p', [this.num, this.textWord])
+    return h('p', {
+      domProps: {}
+    }, [this.num, this.textWord])
   },
 
   props: {
