@@ -1724,6 +1724,8 @@ function flushCallbacks () {
   }
 }
 
+
+/* ------------------------------------------  next-tick相关 🔥  ---------------------------------------------------------- */
 // Here we have async deferring wrappers using both microtasks and (macro) tasks.
 // In < 2.4 we used microtasks everywhere, but there are some scenarios where
 // microtasks have too high a priority and fire in between supposedly
@@ -1732,19 +1734,22 @@ function flushCallbacks () {
 // when state is changed right before repaint (e.g. #6813, out-in transitions).
 // Here we use microtask by default, but expose a way to force (macro) task when
 // needed (e.g. in event handlers attached by v-on).
-var microTimerFunc;
-var macroTimerFunc;
+var microTimerFunc; // 微任务
+var macroTimerFunc; // 宏任务
 var useMacroTask = false;
 
 // Determine (macro) task defer implementation.
 // Technically setImmediate should be the ideal choice, but it's only available
 // in IE. The only polyfill that consistently queues the callback after all DOM
 // events triggered in the same loop is by using MessageChannel.
+// 🔥
+// 对于宏任务，优先检测是否支持原生setImmediate
 if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
   macroTimerFunc = function () {
     setImmediate(flushCallbacks);
   };
 }
+// 不支持setImmediate的话，再去检测是否支持原生的MessageChannel 🔥
 else if (typeof MessageChannel !== 'undefined' && (isNative(MessageChannel) || MessageChannel.toString() === '[object MessageChannelConstructor]')) {
   var channel = new MessageChannel();
   var port = channel.port2;
@@ -1752,15 +1757,17 @@ else if (typeof MessageChannel !== 'undefined' && (isNative(MessageChannel) || M
   macroTimerFunc = function () {
     port.postMessage(1);
   };
-} else {
-  /* istanbul ignore next */
+}
+// 如果MessageChannel也不支持的话，就🔥
+else {
   macroTimerFunc = function () {
     setTimeout(flushCallbacks, 0);
   };
 }
 
 // Determine microtask defer implementation.
-/* istanbul ignore next, $flow-disable-line */
+// 🔥
+// 对于微任务，则检测浏览器是否原生支持 Promise
 if (typeof Promise !== 'undefined' && isNative(Promise)) {
   var p = Promise.resolve();
   microTimerFunc = function () {
@@ -1770,9 +1777,13 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
     // microtask queue but the queue isn't being flushed, until the browser
     // needs to do some other work, e.g. handle a timer. Therefore we can
     // "force" the microtask queue to be flushed by adding an empty timer.
-    if (isIOS) { setTimeout(noop); }
+    if (isIOS) {
+      setTimeout(noop);
+    }
   };
-} else {
+}
+// 如果不支持Promise，直接指向宏任务的实现
+else {
   // fallback to macro
   microTimerFunc = macroTimerFunc;
 }
@@ -1809,7 +1820,9 @@ function nextTick (cb, ctx) {
 
   if (!pending) {
     pending = true;
+
     if (useMacroTask) {
+      // 比如对于一些 DOM 交互事件，如 v-on 绑定的事件回调函数的处理，会强制走 macro task
       macroTimerFunc();
     }
     else {
@@ -1823,6 +1836,7 @@ function nextTick (cb, ctx) {
     })
   }
 }
+/* ------------------------------------------------------------------------------------------------------------------- */
 
 
 var mark;
