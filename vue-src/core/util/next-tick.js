@@ -30,6 +30,18 @@ function flushCallbacks () {
 // where microtasks have too high a priority and fire in between supposedly
 // sequential events (e.g. #4521, #6690, which have workarounds)
 // or even between bubbling of the same event (#6566).
+
+//这里我们有使用微任务的异步延迟包装器。
+//在2.5中，我们使用（宏）任务（与微任务结合）。
+//但是，当状态在重新绘制之前更改时，它有一些微妙的问题
+//（例如6813，在过渡中）。
+//另外，在事件处理程序中使用（宏）任务会导致一些奇怪的行为
+//这是无法避免的（例如7109、7153、7546、7834和8109）。
+//所以我们现在在任何地方都使用微任务。
+//这种权衡的一个主要缺点是
+//如果微任务的优先级太高，并且可能会在两者之间触发
+//顺序事件（例如有解决方法的#4521、#6690）
+//甚至在同一事件的冒泡之间（#6566）。
 let timerFunc
 
 // The nextTick behavior leverages the microtask queue, which can be accessed

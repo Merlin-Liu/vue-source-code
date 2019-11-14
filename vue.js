@@ -1726,6 +1726,9 @@ function flushCallbacks () {
 
 
 /* ------------------------------------------  next-tick相关 🔥  ---------------------------------------------------------- */
+// 为什么要使用nextTick，为什么要异步更新视图
+// 是等同一事件循环中的所有数据都变化完成之后，统一进行视图的更新；如果是同步的更新，达不到所有数据变化完成之后统一更新视图的目的。
+
 // Here we have async deferring wrappers using both microtasks and (macro) tasks.
 // In < 2.4 we used microtasks everywhere, but there are some scenarios where
 // microtasks have too high a priority and fire in between supposedly
