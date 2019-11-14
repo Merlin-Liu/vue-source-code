@@ -926,8 +926,6 @@ function fillParams (
   }
 }
 
-/*  */
-
 function normalizeLocation (raw, current, append, router) {
   var next = typeof raw === 'string' ? { path: raw } : raw;
 
@@ -948,6 +946,7 @@ function normalizeLocation (raw, current, append, router) {
       next.name = current.name;
       next.params = params;
     }
+
     else if (current.matched.length) {
       var rawPath = current.matched[current.matched.length - 1].path;
       next.path = fillParams(rawPath, params, ("path " + (current.path)));
@@ -1981,7 +1980,7 @@ History.prototype.transitionTo = function transitionTo (location, onComplete, on
 };
 
 History.prototype.confirmTransition = function confirmTransition (route, onComplete, onAbort) {
-    var this$1 = this;
+  var this$1 = this;
 
   var current = this.current;
   var abort = function (err) {
@@ -1994,13 +1993,15 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
         this$1.errorCbs.forEach(function (cb) {
           cb(err);
         });
-      } else {
+      }
+      else {
         warn(false, 'uncaught error during route navigation:');
         console.error(err);
       }
     }
     onAbort && onAbort(err);
   };
+
   if (
     isSameRoute(route, current) &&
     // in the case the route map has been dynamically appended to
@@ -2010,13 +2011,10 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
     return abort(new NavigationDuplicated(route))
   }
 
-  var ref = resolveQueue(
-    this.current.matched,
-    route.matched
-  );
-    var updated = ref.updated;
-    var deactivated = ref.deactivated;
-    var activated = ref.activated;
+  var ref = resolveQueue(this.current.matched, route.matched);
+  var updated = ref.updated;
+  var deactivated = ref.deactivated;
+  var activated = ref.activated;
 
   var queue = [].concat(
     // in-component leave guards
