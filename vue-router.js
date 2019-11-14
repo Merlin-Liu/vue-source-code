@@ -38,13 +38,17 @@ function extend (a, b) {
 
 var View = {
   name: 'RouterView',
+
+  // functional组件
   functional: true,
+
   props: {
     name: {
       type: String,
       default: 'default'
     }
   },
+
   render: function render (_, ref) {
     var props = ref.props;
     var children = ref.children;
@@ -178,11 +182,7 @@ var encode = function (str) { return encodeURIComponent(str)
 
 var decode = decodeURIComponent;
 
-function resolveQuery (
-  query,
-  extraQuery,
-  _parseQuery
-) {
+function resolveQuery (query, extraQuery, _parseQuery) {
   if ( extraQuery === void 0 ) extraQuery = {};
 
   var parse = _parseQuery || parseQuery;
@@ -263,18 +263,14 @@ function stringifyQuery (obj) {
 
 var trailingSlashRE = /\/?$/;
 
-function createRoute (
-  record,
-  location,
-  redirectedFrom,
-  router
-) {
+function createRoute (record, location, redirectedFrom, router) {
   var stringifyQuery = router && router.options.stringifyQuery;
 
   var query = location.query || {};
   try {
     query = clone(query);
-  } catch (e) {}
+  }
+  catch (e) {}
 
   var route = {
     name: location.name || (record && record.name),
@@ -286,30 +282,32 @@ function createRoute (
     fullPath: getFullPath(location, stringifyQuery),
     matched: record ? formatMatch(record) : []
   };
+
   if (redirectedFrom) {
     route.redirectedFrom = getFullPath(redirectedFrom, stringifyQuery);
   }
+
   return Object.freeze(route)
 }
 
 function clone (value) {
   if (Array.isArray(value)) {
     return value.map(clone)
-  } else if (value && typeof value === 'object') {
+  }
+  else if (value && typeof value === 'object') {
     var res = {};
     for (var key in value) {
       res[key] = clone(value[key]);
     }
     return res
-  } else {
+  }
+  else {
     return value
   }
 }
 
 // the starting route that represents the initial state
-var START = createRoute(null, {
-  path: '/'
-});
+var START = createRoute(null, {path: '/'});
 
 function formatMatch (record) {
   var res = [];
@@ -320,10 +318,7 @@ function formatMatch (record) {
   return res
 }
 
-function getFullPath (
-  ref,
-  _stringifyQuery
-) {
+function getFullPath (ref, _stringifyQuery) {
   var path = ref.path;
   var query = ref.query; if ( query === void 0 ) query = {};
   var hash = ref.hash; if ( hash === void 0 ) hash = '';
@@ -335,22 +330,26 @@ function getFullPath (
 function isSameRoute (a, b) {
   if (b === START) {
     return a === b
-  } else if (!b) {
+  }
+  else if (!b) {
     return false
-  } else if (a.path && b.path) {
+  }
+  else if (a.path && b.path) {
     return (
       a.path.replace(trailingSlashRE, '') === b.path.replace(trailingSlashRE, '') &&
       a.hash === b.hash &&
       isObjectEqual(a.query, b.query)
     )
-  } else if (a.name && b.name) {
+  }
+  else if (a.name && b.name) {
     return (
       a.name === b.name &&
       a.hash === b.hash &&
       isObjectEqual(a.query, b.query) &&
       isObjectEqual(a.params, b.params)
     )
-  } else {
+  }
+  else {
     return false
   }
 }
@@ -929,17 +928,14 @@ function fillParams (
 
 /*  */
 
-function normalizeLocation (
-  raw,
-  current,
-  append,
-  router
-) {
+function normalizeLocation (raw, current, append, router) {
   var next = typeof raw === 'string' ? { path: raw } : raw;
+
   // named target
   if (next._normalized) {
     return next
-  } else if (next.name) {
+  }
+  else if (next.name) {
     return extend({}, raw)
   }
 
@@ -951,38 +947,30 @@ function normalizeLocation (
     if (current.name) {
       next.name = current.name;
       next.params = params;
-    } else if (current.matched.length) {
+    }
+    else if (current.matched.length) {
       var rawPath = current.matched[current.matched.length - 1].path;
       next.path = fillParams(rawPath, params, ("path " + (current.path)));
-    } else if (process.env.NODE_ENV !== 'production') {
+    }
+    else if (process.env.NODE_ENV !== 'production') {
       warn(false, "relative params navigation requires a current route.");
     }
+
     return next
   }
 
   var parsedPath = parsePath(next.path || '');
   var basePath = (current && current.path) || '/';
-  var path = parsedPath.path
-    ? resolvePath(parsedPath.path, basePath, append || next.append)
-    : basePath;
+  var path = parsedPath.path ? resolvePath(parsedPath.path, basePath, append || next.append) : basePath;
 
-  var query = resolveQuery(
-    parsedPath.query,
-    next.query,
-    router && router.options.parseQuery
-  );
+  var query = resolveQuery(parsedPath.query, next.query, router && router.options.parseQuery);
 
   var hash = next.hash || parsedPath.hash;
   if (hash && hash.charAt(0) !== '#') {
     hash = "#" + hash;
   }
 
-  return {
-    _normalized: true,
-    path: path,
-    query: query,
-    hash: hash
-  }
+  return { _normalized: true, path, query, hash }
 }
 
 /*  */
@@ -1201,11 +1189,13 @@ function install (Vue) {
         this._router.init(this);
 
         // 将this._route定义为响应式对象
-        Vue.util.defineReactive(this, '_route', this._router.history.current);
+        // defineReactive(obj, key, val)
+        Vue.util.defineReactive(this, '_route', this._router.history.current /* 初始化为START */);
       }
       else {
         this._routerRoot = (this.$parent && this.$parent._routerRoot) || this;
       }
+
       registerInstance(this, this);
     },
 
@@ -1215,12 +1205,12 @@ function install (Vue) {
     }
   });
 
-  // 定义router对象
+  // 定义router属性
   Object.defineProperty(Vue.prototype, '$router', {
     get: function get () { return this._routerRoot._router }
   });
 
-  // 定义route对象
+  // 定义route属性
   Object.defineProperty(Vue.prototype, '$route', {
     get: function get () { return this._routerRoot._route }
   });
@@ -1250,7 +1240,7 @@ function createRouteMap (routes, oldPathList, oldPathMap, oldNameMap) {
     addRouteRecord(pathList, pathMap, nameMap, route);
   });
 
-  // 确保通配符路由始终位于末尾
+  // 确保通配符路由( * 路由)始终位于末尾
   for (var i = 0, l = pathList.length; i < l; i++) {
     if (pathList[i] === '*') {
       pathList.push(pathList.splice(i, 1)[0]);
@@ -1405,29 +1395,29 @@ function normalizePath (
 
 
 function createMatcher (routes, router) {
-  var ref = createRouteMap(routes);
-  var pathList = ref.pathList;
-  var pathMap = ref.pathMap;
-  var nameMap = ref.nameMap;
+  const { pathList, pathMap, nameMap } = createRouteMap(routes)
 
   function addRoutes (routes) {
     createRouteMap(routes, pathList, pathMap, nameMap);
   }
 
-  function match (
-    raw,
-    currentRoute,
-    redirectedFrom
-  ) {
+  // raw可以是一个 url 字符串，也可以是一个 Location 对象
+  // currentRoute 是 Route 类型，它表示当前的路径
+  // match 方法返回的是一个路径，它的作用是根据传入的 raw 和当前的路径 currentRoute 计算出一个新的路径并返回
+  function match (raw, currentRoute, redirectedFrom) {
+    // raw，current 计算出新的 location
     var location = normalizeLocation(raw, currentRoute, false, router);
     var name = location.name;
 
     if (name) {
       var record = nameMap[name];
-      if (process.env.NODE_ENV !== 'production') {
-        warn(record, ("Route with name '" + name + "' does not exist"));
+
+      process.env.NODE_ENV !== 'production' && warn(record, ("Route with name '" + name + "' does not exist"));
+
+      if (!record) {
+        return _createRoute(null, location)
       }
-      if (!record) { return _createRoute(null, location) }
+
       var paramNames = record.regex.keys
         .filter(function (key) { return !key.optional; })
         .map(function (key) { return key.name; });
@@ -1446,7 +1436,8 @@ function createMatcher (routes, router) {
 
       location.path = fillParams(record.path, location.params, ("named route \"" + name + "\""));
       return _createRoute(record, location, redirectedFrom)
-    } else if (location.path) {
+    }
+    else if (location.path) {
       location.params = {};
       for (var i = 0; i < pathList.length; i++) {
         var path = pathList[i];
@@ -1456,29 +1447,21 @@ function createMatcher (routes, router) {
         }
       }
     }
+
     // no match
     return _createRoute(null, location)
   }
 
-  function redirect (
-    record,
-    location
-  ) {
+  function redirect (record, location) {
     var originalRedirect = record.redirect;
-    var redirect = typeof originalRedirect === 'function'
-      ? originalRedirect(createRoute(record, location, null, router))
-      : originalRedirect;
+    var redirect = typeof originalRedirect === 'function' ? originalRedirect(createRoute(record, location, null, router)) : originalRedirect;
 
     if (typeof redirect === 'string') {
       redirect = { path: redirect };
     }
 
     if (!redirect || typeof redirect !== 'object') {
-      if (process.env.NODE_ENV !== 'production') {
-        warn(
-          false, ("invalid redirect option: " + (JSON.stringify(redirect)))
-        );
-      }
+      process.env.NODE_ENV !== 'production' && warn(false, ("invalid redirect option: " + (JSON.stringify(redirect))));
       return _createRoute(null, location)
     }
 
@@ -1525,11 +1508,7 @@ function createMatcher (routes, router) {
     }
   }
 
-  function alias (
-    record,
-    location,
-    matchAs
-  ) {
+  function alias (record, location, matchAs) {
     var aliasedPath = fillParams(matchAs, location.params, ("aliased route with path \"" + matchAs + "\""));
     var aliasedMatch = match({
       _normalized: true,
@@ -1544,11 +1523,7 @@ function createMatcher (routes, router) {
     return _createRoute(null, location)
   }
 
-  function _createRoute (
-    record,
-    location,
-    redirectedFrom
-  ) {
+  function _createRoute (record, location, redirectedFrom) {
     if (record && record.redirect) {
       return redirect(record, redirectedFrom || location)
     }
@@ -1558,22 +1533,16 @@ function createMatcher (routes, router) {
     return createRoute(record, location, redirectedFrom, router)
   }
 
-  return {
-    match: match,
-    addRoutes: addRoutes
-  }
+  return { match, addRoutes }
 }
 
-function matchRoute (
-  regex,
-  path,
-  params
-) {
+function matchRoute (regex, path, params) {
   var m = path.match(regex);
 
   if (!m) {
     return false
-  } else if (!params) {
+  }
+  else if (!params) {
     return true
   }
 
@@ -1596,10 +1565,7 @@ function resolveRecordPath (path, record) {
 /*  */
 
 // use User Timing api (if present) for more accurate key precision
-var Time =
-  inBrowser && window.performance && window.performance.now
-    ? window.performance
-    : Date;
+var Time = (inBrowser && window.performance && window.performance.now) ? window.performance : Date;
 
 function genStateKey () {
   return Time.now().toFixed(3)
@@ -1636,12 +1602,7 @@ function setupScroll () {
   });
 }
 
-function handleScroll (
-  router,
-  to,
-  from,
-  isPop
-) {
+function handleScroll (router, to, from, isPop) {
   if (!router.app) {
     return
   }
@@ -1658,12 +1619,7 @@ function handleScroll (
   // wait until re-render finishes before scrolling
   router.app.$nextTick(function () {
     var position = getScrollPosition();
-    var shouldScroll = behavior.call(
-      router,
-      to,
-      from,
-      isPop ? position : null
-    );
+    var shouldScroll = behavior.call(router, to, from, isPop ? position : null);
 
     if (!shouldScroll) {
       return
@@ -2176,12 +2132,7 @@ function resolveQueue (current, next) {
   }
 }
 
-function extractGuards (
-  records,
-  name,
-  bind,
-  reverse
-) {
+function extractGuards (records, name, bind, reverse) {
   var guards = flatMapComponents(records, function (def, instance, match, key) {
     var guard = extractGuard(def, name);
     if (guard) {
@@ -2193,10 +2144,7 @@ function extractGuards (
   return flatten(reverse ? guards.reverse() : guards)
 }
 
-function extractGuard (
-  def,
-  key
-) {
+function extractGuard (def, key) {
   if (typeof def !== 'function') {
     // extend now so that global mixins are applied.
     def = _Vue.extend(def);
@@ -2220,27 +2168,13 @@ function bindGuard (guard, instance) {
   }
 }
 
-function extractEnterGuards (
-  activated,
-  cbs,
-  isValid
-) {
-  return extractGuards(
-    activated,
-    'beforeRouteEnter',
-    function (guard, _, match, key) {
-      return bindEnterGuard(guard, match, key, cbs, isValid)
-    }
-  )
+function extractEnterGuards (activated, cbs, isValid) {
+  return extractGuards(activated, 'beforeRouteEnter', function (guard, _, match, key) {
+    return bindEnterGuard(guard, match, key, cbs, isValid)
+  })
 }
 
-function bindEnterGuard (
-  guard,
-  match,
-  key,
-  cbs,
-  isValid
-) {
+function bindEnterGuard (guard, match, key, cbs, isValid) {
   return function routeEnterGuard (to, from, next) {
     return guard(to, from, function (cb) {
       if (typeof cb === 'function') {
@@ -2258,18 +2192,11 @@ function bindEnterGuard (
   }
 }
 
-function poll (
-  cb, // somehow flow cannot infer this is a function
-  instances,
-  key,
-  isValid
-) {
-  if (
-    instances[key] &&
-    !instances[key]._isBeingDestroyed // do not reuse being destroyed instance
-  ) {
+function poll (cb, /* somehow flow cannot infer this is a function */ instances, key, isValid) {
+  if (instances[key] &&!instances[key]._isBeingDestroyed /* do not reuse being destroyed instance */) {
     cb(instances[key]);
-  } else if (isValid()) {
+  }
+  else if (isValid()) {
     setTimeout(function () {
       poll(cb, instances, key, isValid);
     }, 16);
@@ -2366,7 +2293,7 @@ function getLocation (base) {
 
 /*  */
 
-var HashHistory = /*@__PURE__*/(function (History) {
+var HashHistory = (function (History) {
   function HashHistory (router, base, fallback) {
     History.call(this, router, base);
     // check history fallback deeplinking
@@ -2376,7 +2303,8 @@ var HashHistory = /*@__PURE__*/(function (History) {
     ensureSlash();
   }
 
-  if ( History ) HashHistory.__proto__ = History;
+  if (History) HashHistory.__proto__ = History;
+
   HashHistory.prototype = Object.create( History && History.prototype );
   HashHistory.prototype.constructor = HashHistory;
 
@@ -2481,12 +2409,13 @@ function ensureSlash () {
 }
 
 function getHash () {
-  // We can't use window.location.hash here because it's not
-  // consistent across browsers - Firefox will pre-decode it!
+  // 这里不能使用window.location.hash，因为在不同浏览器之间表示不一致；fireFox会进行预解码
   var href = window.location.href;
   var index = href.indexOf('#');
-  // empty path
-  if (index < 0) { return '' }
+  // 空路径
+  if (index < 0) {
+    return ''
+  }
 
   href = href.slice(index + 1);
   // decode the hash but not the search or hash
@@ -2495,10 +2424,15 @@ function getHash () {
   var searchIndex = href.indexOf('?');
   if (searchIndex < 0) {
     var hashIndex = href.indexOf('#');
+
     if (hashIndex > -1) {
       href = decodeURI(href.slice(0, hashIndex)) + href.slice(hashIndex);
-    } else { href = decodeURI(href); }
-  } else {
+    }
+    else {
+      href = decodeURI(href);
+    }
+  }
+  else {
     if (searchIndex > -1) {
       href = decodeURI(href.slice(0, searchIndex)) + href.slice(searchIndex);
     }
@@ -2611,19 +2545,23 @@ var AbstractHistory = /*@__PURE__*/(function (History) {
 var VueRouter = function VueRouter (options) {
   if ( options === void 0 ) options = {};
 
-  this.app = null;
-  this.apps = [];
-  this.options = options;
+  this.app = null; // 根vue实例
+  this.apps = []; // 所有子组件的vue实例
+  this.options = options; // 传入路由的配置 e.g. { routes: [{ name: 'foo', path: '/foo', component: Foo }, { name: 'bar', path: '/bar', component: Bar }] }
   this.beforeHooks = [];
   this.resolveHooks = [];
   this.afterHooks = [];
+  // 路由匹配器
   this.matcher = createMatcher(options.routes || [], this);
 
+  // 默认路由模式为hash模式
   var mode = options.mode || 'hash';
+  // HTML5的history模式
   this.fallback = mode === 'history' && !supportsPushState && options.fallback !== false;
   if (this.fallback) {
     mode = 'hash';
   }
+  // 非浏览器，如weex中
   if (!inBrowser) {
     mode = 'abstract';
   }
@@ -2640,9 +2578,7 @@ var VueRouter = function VueRouter (options) {
       this.history = new AbstractHistory(this, options.base);
       break
     default:
-      if (process.env.NODE_ENV !== 'production') {
-        assert(false, ("invalid mode: " + mode));
-      }
+      process.env.NODE_ENV !== 'production' && assert(false, ("invalid mode: " + mode));
   }
 };
 
@@ -2657,11 +2593,12 @@ prototypeAccessors.currentRoute.get = function () {
 };
 
 VueRouter.prototype.init = function init (app /* 是一个vue实例 */) {
-    var this$1 = this;
+  var this$1 = this;
+
   // 未use vueRouter
   process.env.NODE_ENV !== 'production' && assert(install.installed, "not installed. Make sure to call `Vue.use(VueRouter)` before creating root instance.");
 
-  // 只有根 vue 实例会保存到 this.apps 中
+  // 将当前实例放到apps中
   this.apps.push(app);
 
   // set up app destroyed handler
@@ -2681,22 +2618,23 @@ VueRouter.prototype.init = function init (app /* 是一个vue实例 */) {
     return
   }
 
+  // 根vue实例
   this.app = app;
 
   var history = this.history;
 
+  // history模式
   if (history instanceof HTML5History) {
     history.transitionTo(history.getCurrentLocation());
   }
+  // hash模式
   else if (history instanceof HashHistory) {
     var setupHashListener = function () {
       history.setupListeners();
     };
-    history.transitionTo(
-      history.getCurrentLocation(),
-      setupHashListener,
-      setupHashListener
-    );
+
+    // 🔥重要
+    history.transitionTo(history.getCurrentLocation(), setupHashListener, setupHashListener);
   }
 
   history.listen(function (route) {

@@ -11,6 +11,7 @@ Vue.use(VueRouter)
 
 // 1. 定义（路由）组件。
 // 可以从其他文件 import 进来
+const Root = { template: '<h1>root</h1>' }
 const Foo = { template: '<p>foo</p>' }
 const Bar = { template: '<i>bar</i>' }
 
@@ -19,6 +20,7 @@ const Bar = { template: '<i>bar</i>' }
 // 通过 Vue.extend() 创建的组件构造器，
 // 或者，只是一个组件配置对象。
 const routes = [
+  { name: 'root', path: '/', component: Root },
   { name: 'foo', path: '/foo', component: Foo },
   { name: 'bar', path: '/bar', component: Bar }
 ]
@@ -261,36 +263,25 @@ const rootVm = new Vue({
   components: {
   },
 
-//   template: `
-// <div>
-//   <p>
-//     <router-link to="/foo">Go to Foo</router-link>
-//     <router-link to="/bar">Go to Bar</router-link>
-//   </p>
-//   <router-view></router-view>
-// </div>`,
-
-  render(h) {
-    return h('p', {
-      domProps: {}
-    }, [this.num, this.textWord])
-  },
+  template: `
+<div>
+  <p>
+    <router-link to="/foo">Go to Foo</router-link>
+    <router-link to="/bar">Go to Bar</router-link>
+  </p>
+  <router-view></router-view>
+</div>`,
 
   props: {
   },
 
   data: {
-    num: 0,
-    text: 'text'
   },
 
   filters: {
   },
 
   computed: {
-    textWord () {
-      return this.text + ', computed'
-    }
   },
 
   watch: {
@@ -299,7 +290,7 @@ const rootVm = new Vue({
   methods: {
   },
 
-  // router,
+  router,
 
   // store
 })
@@ -312,9 +303,3 @@ window.Vue = Vue
 window.vm = rootVm
 window.child = rootVm.$children[0]
 // window.store = store
-
-window.change = function () {
-    rootVm.num += 1
-
-    rootVm.text += '!'
-}
