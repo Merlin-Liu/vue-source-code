@@ -50,10 +50,7 @@ var View = {
   },
 
   render: function render (_, ref) {
-    var props = ref.props;
-    var children = ref.children;
-    var parent = ref.parent;
-    var data = ref.data;
+    const { props, children, parent, data } = ref
 
     // used by devtools to display a router-view badge
     data.routerView = true;
@@ -92,7 +89,7 @@ var View = {
     // render empty node if no matched route
     if (!matched) {
       cache[name] = null;
-      return h()
+      return h('h1', '没有匹配到路由（测试代码）')
     }
 
     var component = cache[name] = matched.components[name];
@@ -102,27 +99,21 @@ var View = {
     data.registerRouteInstance = function (vm, val) {
       // val could be undefined for unregistration
       var current = matched.instances[name];
-      if (
-        (val && current !== vm) ||
-        (!val && current === vm)
-      ) {
+      if ((val && current !== vm) || (!val && current === vm)) {
         matched.instances[name] = val;
       }
     }
 
     // also register instance in prepatch hook
     // in case the same component instance is reused across different routes
-    ;(data.hook || (data.hook = {})).prepatch = function (_, vnode) {
+    (data.hook || (data.hook = {})).prepatch = function (_, vnode) {
       matched.instances[name] = vnode.componentInstance;
     };
 
     // register instance in init hook
     // in case kept-alive component be actived when routes changed
     data.hook.init = function (vnode) {
-      if (vnode.data.keepAlive &&
-        vnode.componentInstance &&
-        vnode.componentInstance !== matched.instances[name]
-      ) {
+      if (vnode.data.keepAlive && vnode.componentInstance && vnode.componentInstance !== matched.instances[name]) {
         matched.instances[name] = vnode.componentInstance;
       }
     };
