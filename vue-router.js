@@ -167,9 +167,9 @@ var commaRE = /%2C/g;
 // fixed encodeURIComponent which is more conformant to RFC3986:
 // - escapes [!'()*]
 // - preserve commas
-var encode = function (str) { return encodeURIComponent(str)
-  .replace(encodeReserveRE, encodeReserveReplacer)
-  .replace(commaRE, ','); };
+var encode = function (str) {
+  return encodeURIComponent(str).replace(encodeReserveRE, encodeReserveReplacer).replace(commaRE, ',');
+};
 
 var decode = decodeURIComponent;
 
@@ -1914,6 +1914,7 @@ var History = function History (router, base) {
   this.base = normalizeBase(base);
   // start with a route object that stands for "nowhere"
   this.current = START;
+  console.error(START)
   this.pending = null;
   this.ready = false;
   this.readyCbs = [];
