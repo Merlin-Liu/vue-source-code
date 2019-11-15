@@ -1745,11 +1745,15 @@ function pushState (url, replace) {
   var history = window.history;
   try {
     if (replace) {
+      // replaceState不会触发popstate事件
       history.replaceState({ key: getStateKey() }, '', url);
-    } else {
+    }
+    else {
+      // pushState不会触发popstate事件
       history.pushState({ key: setStateKey(genStateKey()) }, '', url);
     }
-  } catch (e) {
+  }
+  catch (e) {
     window.location[replace ? 'replace' : 'assign'](url);
   }
 }
@@ -1849,10 +1853,7 @@ function resolveAsyncComponents (matched) {
   }
 }
 
-function flatMapComponents (
-  matched,
-  fn
-) {
+function flatMapComponents (matched, fn) {
   return flatten(matched.map(function (m) {
     return Object.keys(m.components).map(function (key) { return fn(
       m.components[key],
@@ -1866,9 +1867,7 @@ function flatten (arr) {
   return Array.prototype.concat.apply([], arr)
 }
 
-var hasSymbol =
-  typeof Symbol === 'function' &&
-  typeof Symbol.toStringTag === 'symbol';
+var hasSymbol = typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol';
 
 function isESModule (obj) {
   return obj.__esModule || (hasSymbol && obj[Symbol.toStringTag] === 'Module')
@@ -2227,7 +2226,7 @@ function poll (cb, /* somehow flow cannot infer this is a function */ instances,
 
 /*  */
 
-var HTML5History = /*@__PURE__*/(function (History) {
+var HTML5History = (function (History) {
   function HTML5History (router, base) {
     var this$1 = this;
 
@@ -2327,7 +2326,7 @@ var HashHistory = (function (History) {
 
   if (History) HashHistory.__proto__ = History;
 
-  HashHistory.prototype = Object.create( History && History.prototype );
+  HashHistory.prototype = Object.create(History && History.prototype);
   HashHistory.prototype.constructor = HashHistory;
 
   // this is delayed until the app mounts
@@ -2365,9 +2364,8 @@ var HashHistory = (function (History) {
 
   HashHistory.prototype.push = function push (location, onComplete, onAbort) {
     var this$1 = this;
+    var fromRoute = this.current;
 
-    var ref = this;
-    var fromRoute = ref.current;
     this.transitionTo(
       location,
       function (route) {
@@ -2473,7 +2471,8 @@ function getUrl (path) {
 function pushHash (path) {
   if (supportsPushState) {
     pushState(getUrl(path));
-  } else {
+  }
+  else {
     window.location.hash = path;
   }
 }
@@ -2488,7 +2487,7 @@ function replaceHash (path) {
 
 /*  */
 
-var AbstractHistory = /*@__PURE__*/(function (History) {
+var AbstractHistory = (function (History) {
   function AbstractHistory (router, base) {
     History.call(this, router, base);
     this.stack = [];
@@ -2687,14 +2686,14 @@ VueRouter.prototype.onError = function onError (errorCb) {
 };
 
 VueRouter.prototype.push = function push (location, onComplete, onAbort) {
-    var this$1 = this;
+  var this$1 = this;
 
-  // $flow-disable-line
   if (!onComplete && !onAbort && typeof Promise !== 'undefined') {
     return new Promise(function (resolve, reject) {
       this$1.history.push(location, resolve, reject);
     })
-  } else {
+  }
+  else {
     this.history.push(location, onComplete, onAbort);
   }
 };
@@ -2740,22 +2739,14 @@ VueRouter.prototype.getMatchedComponents = function getMatchedComponents (to) {
   }))
 };
 
-VueRouter.prototype.resolve = function resolve (
-  to,
-  current,
-  append
-) {
+VueRouter.prototype.resolve = function resolve (to, current, append) {
   current = current || this.history.current;
-  var location = normalizeLocation(
-    to,
-    current,
-    append,
-    this
-  );
+  var location = normalizeLocation(to, current, append, this);
   var route = this.match(location, current);
   var fullPath = route.redirectedFrom || route.fullPath;
   var base = this.history.base;
   var href = createHref(base, fullPath, this.mode);
+
   return {
     location: location,
     route: route,
