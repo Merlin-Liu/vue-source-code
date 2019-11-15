@@ -1761,19 +1761,23 @@ function replaceState (url) {
 /*  */
 
 function runQueue (queue, fn, cb) {
+  // 异步函数队列化执行的模式
   var step = function (index) {
     if (index >= queue.length) {
       cb();
-    } else {
+    }
+    else {
       if (queue[index]) {
         fn(queue[index], function () {
           step(index + 1);
         });
-      } else {
+      }
+      else {
         step(index + 1);
       }
     }
   };
+
   step(0);
 }
 
@@ -1953,6 +1957,7 @@ History.prototype.transitionTo = function transitionTo (location, onComplete, on
   this.confirmTransition(
     route,
     function () {
+      // 8、执行 this.updateRoute(route) 方法
       this$1.updateRoute(route);
       onComplete && onComplete(route);
       this$1.ensureURL();
@@ -1965,6 +1970,7 @@ History.prototype.transitionTo = function transitionTo (location, onComplete, on
         });
       }
     },
+
     function (err) {
       if (onAbort) {
         onAbort(err);
@@ -2002,30 +2008,34 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
     onAbort && onAbort(err);
   };
 
-  if (
-    isSameRoute(route, current) &&
-    // in the case the route map has been dynamically appended to
-    route.matched.length === current.matched.length
-  ) {
+  // 计算后的 route 和 current 是相同路径的话
+  if (isSameRoute(route, current) && route.matched.length === current.matched.length) {
     this.ensureURL();
     return abort(new NavigationDuplicated(route))
   }
 
-  var ref = resolveQueue(this.current.matched, route.matched);
-  var updated = ref.updated;
-  var deactivated = ref.deactivated;
-  var activated = ref.activated;
+  // this.current.matched、route.matched都是一个RouteRecord的数组
+  const { updated, deactivated, activated } = resolveQueue(this.current.matched, route.matched);
 
   var queue = [].concat(
-    // in-component leave guards
+    // 1、在失活的组件里调用离开守卫
+    // 就是获取到所有失活组件中定义的beforeRouteLeave钩子函数
     extractLeaveGuards(deactivated),
-    // global before hooks
+
+    // 2、调用全局的 beforeEach 守卫
     this.router.beforeHooks,
-    // in-component update hooks
+
+    // 3、在重用的组件里调用 beforeRouteUpdate 守卫
+    // 就是获取到所有重用的组件中定义的 beforeRouteUpdate 钩子函数
     extractUpdateHooks(updated),
-    // in-config enter guards
-    activated.map(function (m) { return m.beforeEnter; }),
-    // async components
+
+    // 4、在激活的路由配置里调用 beforeEnter
+    // 获取的是在激活的路由配置中定义的 beforeEnter 函数
+    activated.map(function (m) {
+      return m.beforeEnter;
+    }),
+
+    // 5、解析异步路由组件
     resolveAsyncComponents(activated)
   );
 
@@ -2034,56 +2044,69 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
     if (this$1.pending !== route) {
       return abort()
     }
-    try {
-      hook(route, current, function (to) {
-        if (to === false || isError(to)) {
-          // next(false) -> abort navigation, ensure current URL
-          this$1.ensureURL(true);
-          abort(to);
-        } else if (
-          typeof to === 'string' ||
-          (typeof to === 'object' &&
-            (typeof to.path === 'string' || typeof to.name === 'string'))
-        ) {
-          // next('/') or next({ path: '/' }) -> redirect
-          abort();
-          if (typeof to === 'object' && to.replace) {
-            this$1.replace(to);
-          } else {
-            this$1.push(to);
-          }
-        } else {
-          // confirm transition and pass on the value
-          next(to);
+
+    const nextFn = function (to) {
+      if (to === false || isError(to)) {
+        // next(false) -> abort navigation, ensure current URL
+        this$1.ensureURL(true);
+        abort(to);
+      }
+      else if (typeof to === 'string' || (typeof to === 'object' && (typeof to.path === 'string' || typeof to.name === 'string'))) {
+        // next('/') or next({ path: '/' }) -> redirect
+        abort();
+
+        if (typeof to === 'object' && to.replace) {
+          this$1.replace(to);
         }
-      });
-    } catch (e) {
+        else {
+          this$1.push(to);
+        }
+      }
+      else {
+        // confirm transition and pass on the value
+        next(to);
+      }
+    }
+
+    try {
+      // 分别对应文档中的to、from、next
+      hook(route, current, nextFn);
+    }
+    catch (e) {
       abort(e);
     }
   };
 
-  runQueue(queue, iterator, function () {
+  const runQueueCallBcak = function () {
     var postEnterCbs = [];
-    var isValid = function () { return this$1.current === route; };
+    const isValid = () => this$1.current === route;
     // wait until async components are resolved before
     // extracting in-component enter guards
+    // 6、在被激活的组件里调用 beforeRouteEnter
     var enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
+
+    // 7、调用全局的 beforeResolve 守卫。
     var queue = enterGuards.concat(this$1.router.resolveHooks);
+
     runQueue(queue, iterator, function () {
       if (this$1.pending !== route) {
         return abort()
       }
+
       this$1.pending = null;
       onComplete(route);
-      if (this$1.router.app) {
-        this$1.router.app.$nextTick(function () {
-          postEnterCbs.forEach(function (cb) {
-            cb();
-          });
+
+      this$1.router.app && this$1.router.app.$nextTick(function () {
+        postEnterCbs.forEach(function (cb) {
+          cb();
         });
-      }
+      });
     });
-  });
+
+  }
+
+  // 🔥 导航守卫，实际上就是发生在路由路径切换的时候，执行的一系列钩子函数
+  runQueue(queue, iterator, runQueueCallBcak);
 };
 
 History.prototype.updateRoute = function updateRoute (route) {
@@ -2123,6 +2146,7 @@ function resolveQueue (current, next) {
       break
     }
   }
+
   return {
     updated: next.slice(0, i),
     activated: next.slice(i),
@@ -2631,7 +2655,7 @@ VueRouter.prototype.init = function init (app /* 是一个vue实例 */) {
       history.setupListeners();
     };
 
-    // 🔥重要
+    // 🔥重要，transitionTo实际上就是在切换history.current
     history.transitionTo(history.getCurrentLocation(), setupHashListener, setupHashListener);
   }
 
