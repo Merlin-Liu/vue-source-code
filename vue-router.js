@@ -106,7 +106,7 @@ var View = {
 
     // also register instance in prepatch hook
     // in case the same component instance is reused across different routes
-    (data.hook || (data.hook = {})).prepatch = function (_, vnode) {
+    ;(data.hook || (data.hook = {})).prepatch = function (_, vnode) {
       matched.instances[name] = vnode.componentInstance;
     };
 
@@ -2313,7 +2313,9 @@ var HashHistory = (function (History) {
     if (fallback && checkFallback(this.base)) {
       return
     }
-    ensureSlash();
+
+    // 字面意思：确保斜线
+    ensureSlash(); // 将localhost:8080修正为localhost:8080/#/
   }
 
   if (History) HashHistory.__proto__ = History;
@@ -2472,7 +2474,8 @@ function pushHash (path) {
 function replaceHash (path) {
   if (supportsPushState) {
     replaceState(getUrl(path));
-  } else {
+  }
+  else {
     window.location.replace(getUrl(path));
   }
 }
