@@ -1246,9 +1246,7 @@ function createRouteMap (routes, oldPathList, oldPathMap, oldNameMap) {
       .filter(function (path) { return path && path.charAt(0) !== '*' && path.charAt(0) !== '/'; });
 
     if (found.length > 0) {
-      var pathNames = found.map(function (path) {
-        return ("- " + path);
-      }).join('\n');
+      var pathNames = found.map(path => "- " + path).join('\n');
       warn(false, ("Non-nested routes must include a leading slash character. Fix the following routes: \n" + pathNames));
     }
   }
@@ -1260,6 +1258,7 @@ function createRouteMap (routes, oldPathList, oldPathMap, oldNameMap) {
   }
 }
 
+// 为每一项路由配置生成一条记录
 function addRouteRecord (pathList, pathMap, nameMap, route, parent, matchAs) {
   var path = route.path;
   var name = route.name;
@@ -1276,6 +1275,7 @@ function addRouteRecord (pathList, pathMap, nameMap, route, parent, matchAs) {
     pathToRegexpOptions.sensitive = route.caseSensitive;
   }
 
+  // 🔥record：记录
   var record = {
     path: normalizedPath,
     regex: compileRouteRegex(normalizedPath, pathToRegexpOptions),
@@ -1287,12 +1287,7 @@ function addRouteRecord (pathList, pathMap, nameMap, route, parent, matchAs) {
     redirect: route.redirect,
     beforeEnter: route.beforeEnter,
     meta: route.meta || {},
-    props:
-      route.props == null
-        ? {}
-        : route.components
-          ? route.props
-          : { default: route.props }
+    props: route.props == null ? {} : (route.components ? route.props : { default: route.props })
   };
 
   if (route.children) {
@@ -1300,11 +1295,7 @@ function addRouteRecord (pathList, pathMap, nameMap, route, parent, matchAs) {
     // If users navigate to this route by name, the default child will
     // not be rendered (GH Issue #629)
     if (process.env.NODE_ENV !== 'production') {
-      if (
-        route.name &&
-        !route.redirect &&
-        route.children.some(function (child) { return /^\/?$/.test(child.path); })
-      ) {
+      if (route.name && !route.redirect && route.children.some(function (child) { return /^\/?$/.test(child.path); })) {
         warn(false ,"Named Route '" + (route.name) + "' has a default child route. When navigating to this named route (:to=\"{name: '" + (route.name) + "'\"), the default child route will not be rendered. Remove the name from this route and use the name of the default child route for named links instead.");
       }
     }
@@ -1314,6 +1305,7 @@ function addRouteRecord (pathList, pathMap, nameMap, route, parent, matchAs) {
     });
   }
 
+  // 添加一条记录到pathMap中
   if (!pathMap[record.path]) {
     pathList.push(record.path);
     pathMap[record.path] = record;
@@ -1329,21 +1321,12 @@ function addRouteRecord (pathList, pathMap, nameMap, route, parent, matchAs) {
         continue
       }
 
-      var aliasRoute = {
-        path: alias,
-        children: route.children
-      };
-      addRouteRecord(
-        pathList,
-        pathMap,
-        nameMap,
-        aliasRoute,
-        parent,
-        record.path || '/' // matchAs
-      );
+      var aliasRoute = { path: alias, children: route.children };
+      addRouteRecord(pathList, pathMap, nameMap, aliasRoute, parent, record.path || '/');
     }
   }
 
+  // 添加一条记录到nameMap中
   if (name) {
     if (!nameMap[name]) {
       nameMap[name] = record;
@@ -1369,14 +1352,18 @@ function compileRouteRegex (path, pathToRegexpOptions) {
   return regex
 }
 
-function normalizePath (
-  path,
-  parent,
-  strict
-) {
-  if (!strict) { path = path.replace(/\/$/, ''); }
-  if (path[0] === '/') { return path }
-  if (parent == null) { return path }
+function normalizePath (path, parent, strict) {
+  if (!strict) {
+    path = path.replace(/\/$/, '');
+  }
+
+  if (path[0] === '/') {
+    return path
+  }
+
+  if (parent == null) {
+    return path
+  }
   return cleanPath(((parent.path) + "/" + path))
 }
 
@@ -1385,25 +1372,33 @@ function normalizePath (
 
 
 function createMatcher (routes, router) {
+  // 用户的路由配置转换成一张路由映射表
+  // 路由表包含3个部分
+  // 1、pathList：存储所有的path，为了记录路由配置中的所有 path
+  // 2、pathMap：表示一个path到RouteRecord的映射关系，使用pathMap可以快速通过path找到对应路由记录（RouteRecord）
+  // 3、nameMap：表示一个name到RouteRecord的映射关系，使用nameMap可以快读通过name找到对应路由记录（RouteRecord）
   const { pathList, pathMap, nameMap } = createRouteMap(routes)
 
+  // 方法的作用是动态添加路由配置，因为在实际开发中有些场景是不能提前把路由写死的，需要根据一些条件动态添加路
   function addRoutes (routes) {
     createRouteMap(routes, pathList, pathMap, nameMap);
   }
 
-  // raw可以是一个 url 字符串，也可以是一个 Location 对象
-  // currentRoute 是 Route 类型，它表示当前的路径
-  // match 方法返回的是一个路径，它的作用是根据传入的 raw 和当前的路径 currentRoute 计算出一个新的路径并返回
+  // raw可以是一个url字符串，也可以是一个Location对象e.g.: { paht: '/foo' }
+  // currentRoute是Route类型，它表示当前的路径
+  // match 方法返回的是一个路径
+  // 它的作用是根据传入的raw和当前的路径currentRoute计算出一个新的路径并返回
   function match (raw, currentRoute, redirectedFrom) {
-    // raw，current 计算出新的 location
-    var location = normalizeLocation(raw, currentRoute, false, router);
+    var location = normalizeLocation(raw, currentRoute, false, router); // 根据raw，current计算出新的location
     var name = location.name;
 
+    // 使用name寻找对应的record
     if (name) {
-      var record = nameMap[name];
+      var record = nameMap[name]; // 使用nameMap找到name所对应的record
 
       process.env.NODE_ENV !== 'production' && warn(record, ("Route with name '" + name + "' does not exist"));
 
+      // 如果name对应的record不存在，则匹配失败，返回一个空路径
       if (!record) {
         return _createRoute(null, location)
       }
@@ -1427,6 +1422,7 @@ function createMatcher (routes, router) {
       location.path = fillParams(record.path, location.params, ("named route \"" + name + "\""));
       return _createRoute(record, location, redirectedFrom)
     }
+    // 使用path寻找对应的record
     else if (location.path) {
       location.params = {};
       for (var i = 0; i < pathList.length; i++) {
@@ -1438,7 +1434,7 @@ function createMatcher (routes, router) {
       }
     }
 
-    // no match
+    // 使用name、path都找不到对应的record，匹配失败
     return _createRoute(null, location)
   }
 
