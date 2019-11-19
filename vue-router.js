@@ -148,13 +148,7 @@ function resolveProps (route, config) {
     case 'boolean':
       return config ? route.params : undefined
     default:
-      if (process.env.NODE_ENV !== 'production') {
-        warn(
-          false,
-          "props in \"" + (route.path) + "\" is a " + (typeof config) + ", " +
-          "expecting an object, function or boolean."
-        );
-      }
+      process.env.NODE_ENV !== 'production' && warn(false,"props in \"" + (route.path) + "\" is a " + (typeof config) + ", expecting an object, function or boolean.");
   }
 }
 
@@ -1910,7 +1904,6 @@ var History = function History (router, base) {
   this.base = normalizeBase(base);
   // start with a route object that stands for "nowhere"
   this.current = START;
-  console.error(START)
   this.pending = null;
   this.ready = false;
   this.readyCbs = [];
@@ -1937,14 +1930,14 @@ History.prototype.onError = function onError (errorCb) {
   this.errorCbs.push(errorCb);
 };
 
+// 🔥transitionTo实际就是在切换this.current
 History.prototype.transitionTo = function transitionTo (location, onComplete, onAbort) {
   var this$1 = this;
 
+  // 🔥使用location和this.current执行this.router.match方法去匹配到目标的路径
   var route = this.router.match(location, this.current);
-  this.confirmTransition(
-    route,
-    function () {
-      // 8、执行 this.updateRoute(route) 方法
+  this.confirmTransition(route, function () {
+      // 8、执行 this.updateRoute(route) 方法 🔥这一步最终更新this.current
       this$1.updateRoute(route);
       onComplete && onComplete(route);
       this$1.ensureURL();
@@ -2099,7 +2092,7 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
 History.prototype.updateRoute = function updateRoute (route) {
   var prev = this.current;
   this.current = route;
-  this.cb && this.cb(route);
+  this.cb && this.cb(route); // 更新所有组件实例的_route值，也就是$route的值
   this.router.afterHooks.forEach(function (hook) {
     hook && hook(route, prev);
   });
@@ -2649,6 +2642,7 @@ VueRouter.prototype.init = function init (app /* 是一个vue实例 */) {
     history.transitionTo(history.getCurrentLocation(), setupHashListener, setupHashListener);
   }
 
+  // update完成之后更新所有组件的_route
   history.listen(function (route) {
     this$1.apps.forEach(function (app) {
       app._route = route;
