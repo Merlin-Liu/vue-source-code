@@ -3925,13 +3925,7 @@ function FunctionalRenderContext (
 
 installRenderHelpers(FunctionalRenderContext.prototype);
 
-function createFunctionalComponent (
-  Ctor,
-  propsData,
-  data,
-  contextVm,
-  children
-) {
+function createFunctionalComponent (Ctor, propsData, data, contextVm, children) {
   var options = Ctor.options;
   var props = {};
   var propOptions = options.props;
@@ -3939,24 +3933,25 @@ function createFunctionalComponent (
     for (var key in propOptions) {
       props[key] = validateProp(key, propOptions, propsData || emptyObject);
     }
-  } else {
-    if (isDef(data.attrs)) { mergeProps(props, data.attrs); }
-    if (isDef(data.props)) { mergeProps(props, data.props); }
+  }
+  else {
+    if (isDef(data.attrs)) {
+      mergeProps(props, data.attrs);
+    }
+
+    if (isDef(data.props)) {
+      mergeProps(props, data.props);
+    }
   }
 
-  var renderContext = new FunctionalRenderContext(
-    data,
-    props,
-    children,
-    contextVm,
-    Ctor
-  );
+  var renderContext = new FunctionalRenderContext(data, props, children, contextVm, Ctor);
 
   var vnode = options.render.call(null, renderContext._c, renderContext);
 
   if (vnode instanceof VNode) {
     return cloneAndMarkFunctionalResult(vnode, data, renderContext.parent, options)
-  } else if (Array.isArray(vnode)) {
+  }
+  else if (Array.isArray(vnode)) {
     var vnodes = normalizeChildren(vnode) || [];
     var res = new Array(vnodes.length);
     for (var i = 0; i < vnodes.length; i++) {
@@ -10120,9 +10115,7 @@ function genDirectives (el, state) {
 
 function genInlineTemplate (el, state) {
   var ast = el.children[0];
-  if (process.env.NODE_ENV !== 'production' && (
-    el.children.length !== 1 || ast.type !== 1
-  )) {
+  if (process.env.NODE_ENV !== 'production' && ( el.children.length !== 1 || ast.type !== 1 )) {
     state.warn('Inline-template components must have exactly one child element.');
   }
   if (ast.type === 1) {

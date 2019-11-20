@@ -50,7 +50,7 @@ var View = {
   },
 
   render: function render (_, ref) {
-    const { props, children, parent, data } = ref
+    var { props, children, parent, data } = ref
 
     // used by devtools to display a router-view badge
     data.routerView = true;
@@ -59,6 +59,7 @@ var View = {
     // so that components rendered by router-view can resolve named slots
     var h = parent.$createElement;
     var name = props.name;
+    // 触发_route的getter，进行依赖收集，当_router变化的时候，派发更新，重新执行render函数
     var route = parent.$route;
     var cache = parent._routerViewCache || (parent._routerViewCache = {});
 
@@ -196,15 +197,15 @@ function parseQuery (query) {
   query.split('&').forEach(function (param) {
     var parts = param.replace(/\+/g, ' ').split('=');
     var key = decode(parts.shift());
-    var val = parts.length > 0
-      ? decode(parts.join('='))
-      : null;
+    var val = parts.length > 0 ? decode(parts.join('=')) : null;
 
     if (res[key] === undefined) {
       res[key] = val;
-    } else if (Array.isArray(res[key])) {
+    }
+    else if (Array.isArray(res[key])) {
       res[key].push(val);
-    } else {
+    }
+    else {
       res[key] = [res[key], val];
     }
   });
@@ -1167,6 +1168,8 @@ function install (Vue) {
   Vue.mixin({
     // 混入beforeCreate钩子
     beforeCreate: function beforeCreate () {
+
+      // 🔥 挂载router的vue实例，即通过new Vue({ router：{...} })实例化的实例
       if (isDef(this.$options.router)) {
         this._routerRoot = this;
         this._router = this.$options.router;
@@ -1176,6 +1179,7 @@ function install (Vue) {
         // defineReactive(obj, key, val)
         Vue.util.defineReactive(this, '_route', this._router.history.current /* 初始化为START */);
       }
+      // 🔥 挂载router的vue实例下的子组件
       else {
         this._routerRoot = (this.$parent && this.$parent._routerRoot) || this;
       }
@@ -1939,7 +1943,7 @@ History.prototype.transitionTo = function transitionTo (location, onComplete, on
 
   const onConfirmTransitionComplete = function () {
     // 8、执行 this.updateRoute(route) 方法 🔥这一步最终更新this.current
-    // this$1.updateRoute(route);
+    this$1.updateRoute(route);
     onComplete && onComplete(route);
     this$1.ensureURL();
 
@@ -2608,10 +2612,14 @@ VueRouter.prototype.init = function init (app /* 是一个vue实例 */) {
   app.$once('hook:destroyed', function () {
     // clean out app from this.apps array once destroyed
     var index = this$1.apps.indexOf(app);
-    if (index > -1) { this$1.apps.splice(index, 1); }
+    if (index > -1) {
+      this$1.apps.splice(index, 1);
+    }
     // ensure we still have a main app or null if no apps
     // we do not release the router so it can be reused
-    if (this$1.app === app) { this$1.app = this$1.apps[0] || null; }
+    if (this$1.app === app) {
+      this$1.app = this$1.apps[0] || null;
+    }
   });
 
   // main app previously initialized
