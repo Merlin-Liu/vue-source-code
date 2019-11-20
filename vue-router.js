@@ -1373,7 +1373,7 @@ function createMatcher (routes, router) {
   // 3、nameMap：表示一个name到RouteRecord的映射关系，使用nameMap可以快读通过name找到对应路由记录（RouteRecord）
   const { pathList, pathMap, nameMap } = createRouteMap(routes)
 
-  // 方法的作用是动态添加路由配置，因为在实际开发中有些场景是不能提前把路由写死的，需要根据一些条件动态添加路
+  // 方法的作用是动态添加路由配置，因为在实际开发中有些场景是不能提前把路由写死的，需要根据一些条件动态添加
   function addRoutes (routes) {
     createRouteMap(routes, pathList, pathMap, nameMap);
   }
@@ -1935,45 +1935,43 @@ History.prototype.transitionTo = function transitionTo (location, onComplete, on
   var this$1 = this;
 
   // 🔥使用location和this.current执行this.router.match方法去匹配到目标的路径
-  var route = this.router.match(location, this.current);
-  this.confirmTransition(route, function () {
-      // 8、执行 this.updateRoute(route) 方法 🔥这一步最终更新this.current
-      this$1.updateRoute(route);
-      onComplete && onComplete(route);
-      this$1.ensureURL();
+  const route = this.router.match(location, this.current);
 
-      // fire ready cbs once
-      if (!this$1.ready) {
-        this$1.ready = true;
-        this$1.readyCbs.forEach(function (cb) {
-          cb(route);
-        });
-      }
-    },
+  const onConfirmTransitionComplete = function () {
+    // 8、执行 this.updateRoute(route) 方法 🔥这一步最终更新this.current
+    // this$1.updateRoute(route);
+    onComplete && onComplete(route);
+    this$1.ensureURL();
 
-    function (err) {
-      if (onAbort) {
-        onAbort(err);
-      }
-      if (err && !this$1.ready) {
-        this$1.ready = true;
-        this$1.readyErrorCbs.forEach(function (cb) {
-          cb(err);
-        });
-      }
+    // fire ready cbs once
+    if (!this$1.ready) {
+      this$1.ready = true;
+      this$1.readyCbs.forEach(function (cb) {
+        cb(route);
+      });
     }
-  );
+  }
+
+  const onConfirmTransitionAbort = function (err) {
+    if (onAbort) {
+      onAbort(err);
+    }
+    if (err && !this$1.ready) {
+      this$1.ready = true;
+      this$1.readyErrorCbs.forEach(function (cb) {
+        cb(err);
+      });
+    }
+  }
+
+  this.confirmTransition(route, onConfirmTransitionComplete, onConfirmTransitionAbort);
 };
 
 History.prototype.confirmTransition = function confirmTransition (route, onComplete, onAbort) {
   var this$1 = this;
 
-  var current = this.current;
-  var abort = function (err) {
-    // after merging https://github.com/vuejs/vue-router/pull/2771 we
-    // When the user navigates through history through back/forward buttons
-    // we do not want to throw the error. We only throw it if directly calling
-    // push/replace. That's why it's not included in isError
+  const current = this.current;
+  const abort = function (err) {
     if (!isExtendedError(NavigationDuplicated, err) && isError(err)) {
       if (this$1.errorCbs.length) {
         this$1.errorCbs.forEach(function (cb) {
@@ -1997,7 +1995,7 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
   // this.current.matched、route.matched都是一个RouteRecord的数组
   const { updated, deactivated, activated } = resolveQueue(this.current.matched, route.matched);
 
-  var queue = [].concat(
+  const queue = [].concat(
     // 1、在失活的组件里调用离开守卫
     // 就是获取到所有失活组件中定义的beforeRouteLeave钩子函数
     extractLeaveGuards(deactivated),
@@ -2020,7 +2018,8 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
   );
 
   this.pending = route;
-  var iterator = function (hook, next) {
+
+  const iterator = function (hook, next) {
     if (this$1.pending !== route) {
       return abort()
     }
@@ -2076,10 +2075,8 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
       this$1.pending = null;
       onComplete(route);
 
-      this$1.router.app && this$1.router.app.$nextTick(function () {
-        postEnterCbs.forEach(function (cb) {
-          cb();
-        });
+      this$1.router.app && this$1.router.app.$nextTick(() => {
+        postEnterCbs.forEach(cb => cb());
       });
     });
 
@@ -2639,7 +2636,11 @@ VueRouter.prototype.init = function init (app /* 是一个vue实例 */) {
     };
 
     // 🔥重要，transitionTo实际上就是在切换history.current
-    history.transitionTo(history.getCurrentLocation(), setupHashListener, setupHashListener);
+    history.transitionTo(
+      history.getCurrentLocation(), // history.getCurrentLocation() 就是getHash方法
+      setupHashListener,
+      setupHashListener
+    );
   }
 
   // update完成之后更新所有组件的_route
