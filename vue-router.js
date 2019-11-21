@@ -2329,7 +2329,7 @@ var HashHistory = (function (History) {
     window.addEventListener(supportsPushState ? 'popstate' : 'hashchange', function () {
       var current = this$1.current;
 
-      if (!ensureSlash()) {
+      if (!ensureSlash() /* 修正路由 */) {
         return
       }
 
