@@ -1485,25 +1485,32 @@ function mergeOptions (parent, child, vm) {
  * to assets defined in its ancestor chain.
  */
 function resolveAsset (options, type, id, warnMissing) {
-
   if (typeof id !== 'string') {
     return
   }
+
   var assets = options[type];
   // check local registration variations first
-  if (hasOwn(assets, id)) { return assets[id] }
+  if (hasOwn(assets, id)) {
+    return assets[id]
+  }
+
   var camelizedId = camelize(id);
-  if (hasOwn(assets, camelizedId)) { return assets[camelizedId] }
+  if (hasOwn(assets, camelizedId)) {
+    return assets[camelizedId]
+  }
+
   var PascalCaseId = capitalize(camelizedId);
-  if (hasOwn(assets, PascalCaseId)) { return assets[PascalCaseId] }
+  if (hasOwn(assets, PascalCaseId)) {
+    return assets[PascalCaseId]
+  }
+
   // fallback to prototype chain
   var res = assets[id] || assets[camelizedId] || assets[PascalCaseId];
   if (process.env.NODE_ENV !== 'production' && warnMissing && !res) {
-    warn(
-      'Failed to resolve ' + type.slice(0, -1) + ': ' + id,
-      options
-    );
+    warn('Failed to resolve ' + type.slice(0, -1) + ': ' + id, options);
   }
+
   return res
 }
 
@@ -4268,6 +4275,7 @@ function _createElement (context, tag, data, children, normalizationType) {
       vnode = new VNode(config.parsePlatformTagName(tag), data, children, undefined, undefined, context);
     }
     else if (isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
+      console.log('这是一个已经注册过的组件')
       // component
       vnode = createComponent(Ctor, data, context, children, tag);
     }
@@ -4295,7 +4303,8 @@ function _createElement (context, tag, data, children, normalizationType) {
     if (isDef(ns)) { applyNS(vnode, ns); }
     if (isDef(data)) { registerDeepBindings(data); }
     return vnode
-  } else {
+  }
+  else {
     return createEmptyVNode()
   }
 }
@@ -5426,7 +5435,8 @@ function createPatchFunction ({modules, nodeOps}) {
           creatingElmInVPre++;
         }
         if (isUnknownElement$$1(vnode, creatingElmInVPre)) {
-          warn('Unknown custom element: <' + tag + '> - did you ' + 'register the component correctly? For recursive components, ' + 'make sure to provide the "name" option.', vnode.context);
+          console.error(`<${tag}>组件未注册！`)
+          // warn('Unknown custom element: <' + tag + '> - did you ' + 'register the component correctly? For recursive components, ' + 'make sure to provide the "name" option.', vnode.context);
         }
       }
 

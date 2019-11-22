@@ -6,76 +6,78 @@ import VueRouter from './vue-router'
 import Vuex from './vuex'
 
 
-Vue.use(VueRouter)
-// Vue.use(Vuex)
+// Vue.use(VueRouter)
+Vue.use(Vuex)
 
 // 1. 定义（路由）组件。
 // 可以从其他文件 import 进来
-const Root = {
-  name: 'root',
+// const Root = {
+//   name: 'root',
 
-  template: '<button @click="showRoute">root</button>',
+//   template: '<button @click="showRoute">root</button>',
 
-  methods: {
-    showRoute() {
-      console.log(this.$route)
-    }
-  }
-}
-const Foo = {
-  name: 'foo',
+//   methods: {
+//     showRoute() {
+//       console.log(this.$route)
+//     }
+//   }
+// }
+// const Foo = {
+//   name: 'foo',
 
-  template: '<button @click="showRoute">foo</button>',
+//   template: '<button @click="showRoute">foo</button>',
 
-  methods: {
-    showRoute() {
-      console.log(this.$route)
-    }
-  }
-}
-const Bar = {
-  name: 'bar',
+//   methods: {
+//     showRoute() {
+//       console.log(this.$route)
+//     }
+//   }
+// }
+// const Bar = {
+//   name: 'bar',
 
-  template: '<button @click="showRoute">bar</button>',
+//   template: '<button @click="showRoute">bar</button>',
 
-  methods: {
-    showRoute() {
-      console.log(this.$route)
-    }
-  }
-}
+//   methods: {
+//     showRoute() {
+//       console.log(this.$route)
+//     }
+//   }
+// }
 
-window.Root = Root
-window.Foo = Foo
-window.Bar = Bar
+// window.Root = Root
+// window.Foo = Foo
+// window.Bar = Bar
 
 // 2. 定义路由
 // 每个路由应该映射一个组件。 其中"component" 可以是
 // 通过 Vue.extend() 创建的组件构造器，
 // 或者，只是一个组件配置对象。
-const routes = [
-  { name: 'root', path: '/', component: Root },
-  { name: 'foo', path: '/foo', component: Foo },
-  { name: 'bar', path: '/bar', component: Bar }
-]
+// const routes = [
+//   { name: 'root', path: '/', component: Root },
+//   { name: 'foo', path: '/foo', component: Foo },
+//   { name: 'bar', path: '/bar', component: Bar }
+// ]
 
-const router = new VueRouter({routes})
+// router实例
+// const router = new VueRouter({routes})
 
-// const store = new Vuex.Store({
-//   state: {
-//     count: {
-//       countA: 0,
-//       countB: 0
-//     }
-//   },
-//   mutations: {
-//     increment (state) {
-//       state.count.countA++
-//       state.count.countB++
-//     }
-//   },
-//   strict: 1
-// })
+// vuex实例
+const store = new Vuex.Store({
+  state: {
+    count: {
+      countA: 0,
+      countB: 0
+    }
+  },
+  mutations: {
+    increment (state) {
+      state.count.countA++
+      state.count.countB++
+    }
+  },
+  strict: 1
+})
 
 
 const handleClick = function () {
@@ -291,7 +293,7 @@ const componentWithPorps = {
 }
 
 
-const compTest = {
+const compRuter = {
   name: 'compTest',
 
   render(h) {
@@ -303,27 +305,11 @@ const compTest = {
 /* ------------------------------------------------------------------------------------------------ */
 const rootVm = new Vue({
   components: {
-    compTest
+    componentC
   },
 
-//   template: `
-// <div>
-//   <!-- <p>
-//     <router-link to="/foo">Go to Foo</router-link>
-//     <router-link to="/bar">Go to Bar</router-link>
-//   </p> -->
-//   <router-view></router-view>
-// </div>`,
-
   render(h) {
-    return h('div', [
-      h('button', {
-        on: { click: () => this.a += 1 }
-      }, this.a),
-      h('br'),
-      h('br'),
-      h('comp-test')
-    ])
+    return h('component-c')
   },
 
   props: {
@@ -345,9 +331,9 @@ const rootVm = new Vue({
   methods: {
   },
 
-  router,
+  // router,
 
-  // store
+  store
 })
 
 // 挂载
@@ -357,4 +343,4 @@ rootVm.$mount('#app')
 window.Vue = Vue
 window.vm = rootVm
 window.child = rootVm.$children[0]
-// window.store = store
+window.store = store
