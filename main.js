@@ -71,8 +71,11 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
-    increment (state) {
+    incrementA (state) {
       state.count.countA++
+    },
+
+    incrementB (state) {
       state.count.countB++
     }
   },
@@ -305,18 +308,34 @@ const compRuter = {
 /* ------------------------------------------------------------------------------------------------ */
 const rootVm = new Vue({
   components: {
-    componentC
   },
 
   render(h) {
-    return h('component-c')
+    return h('div', [
+      h('button', {
+        on: {
+          click: () => {
+            this.$store.commit('incrementA')
+          }
+        }
+      },
+      this.$store.state.count.countA),
+
+      h('button', {
+        on: {
+          click: () => {
+            this.$store.commit('incrementB')
+          }
+        }
+      },
+      this.$store.state.count.countB)
+    ])
   },
 
   props: {
   },
 
   data: {
-    a: 1
   },
 
   filters: {

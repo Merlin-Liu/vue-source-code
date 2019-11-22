@@ -796,7 +796,7 @@ var createEmptyVNode = function (text) {
 
   var node = new VNode();
   node.text = text;
-  node.isComment = true;
+  node.isComment = true; // 空节点是个注释节点
   return node
 };
 
@@ -1495,11 +1495,13 @@ function resolveAsset (options, type, id, warnMissing) {
     return assets[id]
   }
 
+  // 转驼峰 e.g. comp-a => compA
   var camelizedId = camelize(id);
   if (hasOwn(assets, camelizedId)) {
     return assets[camelizedId]
   }
 
+  // 首字母转大写
   var PascalCaseId = capitalize(camelizedId);
   if (hasOwn(assets, PascalCaseId)) {
     return assets[PascalCaseId]
@@ -1575,7 +1577,7 @@ function getPropDefaultValue (vm, prop, key) {
   }
   // the raw prop value was also undefined from previous render,
   // return previous default value to avoid unnecessary watcher trigger
-  // 缓存策略、返回上次结果
+  // props缓存策略、返回上次结果
   if (vm && vm.$options.propsData && vm.$options.propsData[key] === undefined && vm._props[key] !== undefined) {
     return vm._props[key]
   }
@@ -2066,13 +2068,15 @@ function mergeVNodeHook (def, hookKey, hook) {
   if (isUndef(oldHook)) {
     // no existing hook
     invoker = createFnInvoker([wrappedHook]);
-  } else {
+  }
+  else {
 
     if (isDef(oldHook.fns) && isTrue(oldHook.merged)) {
       // already a merged invoker
       invoker = oldHook;
       invoker.fns.push(wrappedHook);
-    } else {
+    }
+    else {
       // existing plain hook
       invoker = createFnInvoker([oldHook, wrappedHook]);
     }
@@ -4226,8 +4230,18 @@ function createElement (context, tag, data, children, normalizationType, alwaysN
 }
 
 function _createElement (context, tag, data, children, normalizationType) {
-  const type = typeof tag === 'object' ? '组件' : 'HTML标签'
-  console.renderGroup(`一个创建vnode过程开始：这是一个${type}，${type}名：${type === '组件' ? tag.name : tag}   `)
+  const {type, name} = ((tag) => {
+    if (typeof tag === 'string') {
+      return {
+        type: config.isReservedTag(tag) ? 'HTML标签' : '组件',
+        name: tag
+      }
+    }
+    else {
+      return { type: '组件', name: tag.name }
+    }
+  })(tag)
+  console.renderGroup(`一个创建vnode过程开始：这是一个${type}，${type}名：${name}   `)
 
   if (isDef(data) && isDef((data).__ob__)) {
     // 使用被观察过的对象作为vnode的data， waring
@@ -4274,8 +4288,8 @@ function _createElement (context, tag, data, children, normalizationType) {
       // platform built-in elements
       vnode = new VNode(config.parsePlatformTagName(tag), data, children, undefined, undefined, context);
     }
+    // 组件
     else if (isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
-      console.log('这是一个已经注册过的组件')
       // component
       vnode = createComponent(Ctor, data, context, children, tag);
     }

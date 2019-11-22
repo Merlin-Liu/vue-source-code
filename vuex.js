@@ -53,7 +53,9 @@ function devtoolPlugin (store) {
 }
 
 function forEachValue (obj, fn) {
-  Object.keys(obj).forEach(function (key) { return fn(obj[key], key); });
+  Object.keys(obj).forEach(function (key) {
+    return fn(obj[key], key);
+  });
 }
 
 function isObject (obj) {
@@ -166,8 +168,8 @@ ModuleCollection.prototype.update = function update$1 (rawRootModule) {
 };
 
 ModuleCollection.prototype.register = function register (path, rawModule, runtime) {
-    var this$1 = this;
-    if (runtime === void 0) runtime = true;
+  var this$1 = this;
+  if (runtime === void 0) runtime = true;
 
   if (process.env.NODE_ENV !== 'production') {
     assertRawModule(path, rawModule);
@@ -175,6 +177,7 @@ ModuleCollection.prototype.register = function register (path, rawModule, runtim
 
   var newModule = new Module(rawModule, runtime);
   if (path.length === 0) {
+    // 注册root module
     this.root = newModule;
   }
   else {
@@ -184,6 +187,7 @@ ModuleCollection.prototype.register = function register (path, rawModule, runtim
 
   // register nested modules
   if (rawModule.modules) {
+    // 注册其他modules
     forEachValue(rawModule.modules, function (rawChildModule, key) {
       this$1.register(path.concat(key), rawChildModule, runtime);
     });
@@ -306,12 +310,12 @@ var Store = function Store (options) {
   this._actionSubscribers = [];
   this._mutations = Object.create(null);
   this._wrappedGetters = Object.create(null);
-  this._modules = new ModuleCollection(options);
+  this._modules = new ModuleCollection(options); // 字面意思：模块集合
   this._modulesNamespaceMap = Object.create(null);
   this._subscribers = [];
-  console.log('构造Vuex的watcher实例')
+  console.error('构造Vuex的watcher实例')
   this._watcherVM = new Vue();
-  console.log('构造Vuex的watcher实例结束')
+  console.error('构造Vuex的watcher实例结束')
 
   // bind commit and dispatch to self
   var store = this;
@@ -337,9 +341,9 @@ var Store = function Store (options) {
 
   // initialize the store vm, which is responsible for the reactivity
   // (also registers _wrappedGetters as computed properties)
-  console.log('构造Vuex的store实例')
+  console.error('构造Vuex的store实例')
   resetStoreVM(this, state);
-  console.log('构造Vuex的store实例结束')
+  console.error('构造Vuex的store实例结束')
 
   // apply plugins
   plugins.forEach(function (plugin) {
