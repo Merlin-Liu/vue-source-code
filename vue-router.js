@@ -1706,17 +1706,11 @@ function scrollToPosition (shouldScroll, position) {
 
 /*  */
 
-var supportsPushState =
-  inBrowser &&
+var supportsPushState = inBrowser &&
   (function () {
     var ua = window.navigator.userAgent;
 
-    if (
-      (ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) &&
-      ua.indexOf('Mobile Safari') !== -1 &&
-      ua.indexOf('Chrome') === -1 &&
-      ua.indexOf('Windows Phone') === -1
-    ) {
+    if ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) && ua.indexOf('Mobile Safari') !== -1 && ua.indexOf('Chrome') === -1 && ua.indexOf('Windows Phone') === -1) {
       return false
     }
 
@@ -2335,10 +2329,12 @@ var HashHistory = (function (History) {
 
       this$1.transitionTo(getHash(), function (route) {
         if (supportsScroll) {
+          // history模式下、且scrollBehavior
           handleScroll(this$1.router, route, current, true);
         }
 
         if (!supportsPushState) {
+          // 一般浏览器不会进入这里
           replaceHash(route.fullPath);
         }
       });
