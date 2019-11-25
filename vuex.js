@@ -592,13 +592,17 @@ function resetStoreVM (store, state, hot) {
         oldVm._data.$$state = null;
       });
     }
-    Vue.nextTick(function () { return oldVm.$destroy(); });
+
+    Vue.nextTick(function () {
+      return oldVm.$destroy();
+    });
   }
 }
 
 function installModule (store, rootState, path, module, hot) {
   var isRoot = !path.length;
   var namespace = store._modules.getNamespace(path);
+  console.log(installModule)
 
   // register in namespace map
   if (module.namespaced) {
@@ -645,6 +649,7 @@ function makeLocalContext (store, namespace, path) {
   var noNamespace = namespace === '';
 
   var local = {
+    // 没有命名空间，直接指向root store的dispatch
     dispatch: noNamespace ? store.dispatch : function (_type, _payload, _options) {
       var args = unifyObjectStyle(_type, _payload, _options);
       var payload = args.payload;
@@ -662,6 +667,7 @@ function makeLocalContext (store, namespace, path) {
       return store.dispatch(type, payload)
     },
 
+    // 没有命名空间，直接指向root store的commit
     commit: noNamespace ? store.commit : function (_type, _payload, _options) {
       var args = unifyObjectStyle(_type, _payload, _options);
       var payload = args.payload;
@@ -684,10 +690,14 @@ function makeLocalContext (store, namespace, path) {
   // because they will be changed by vm update
   Object.defineProperties(local, {
     getters: {
+      // 没有命名空间，直接指向root store的getters
       get: noNamespace ? function () { return store.getters; } : function () { return makeLocalGetters(store, namespace); }
     },
+
     state: {
-      get: function () { return getNestedState(store.state, path); }
+      get: function () {
+        return getNestedState(store.state, path);
+      }
     }
   });
 
