@@ -748,7 +748,7 @@ function registerMutation (store, type, handler, local) {
 function registerAction (store, type, handler, local) {
   var entry = store._actions[type] || (store._actions[type] = []);
   entry.push(function wrappedActionHandler (payload, cb) {
-    console.error(payload, cb)
+    // 这个cb是提供给vuex的插件用的
     var res = handler.call(store, {
       dispatch: local.dispatch,
       commit: local.commit,
@@ -837,13 +837,11 @@ function install (_Vue) {
  */
 var mapState = normalizeNamespace(function (namespace, states) {
   var res = {};
-  normalizeMap(states).forEach(function (ref) {
-    var key = ref.key;
-    var val = ref.val;
 
+  normalizeMap(states).forEach(function ({key, val}) {
     res[key] = function mappedState () {
-      var state = this.$store.state;
-      var getters = this.$store.getters;
+      var {state, getters} = this.$store
+
       if (namespace) {
         var module = getModuleByNamespace(this.$store, 'mapState', namespace);
         if (!module) {
@@ -852,13 +850,13 @@ var mapState = normalizeNamespace(function (namespace, states) {
         state = module.context.state;
         getters = module.context.getters;
       }
-      return typeof val === 'function'
-        ? val.call(this, state, getters)
-        : state[val]
+
+      return typeof val === 'function' ? val.call(this, state, getters) : state[val]
     };
     // mark vuex getter for devtools
     res[key].vuex = true;
   });
+
   return res
 });
 
@@ -993,9 +991,11 @@ function normalizeNamespace (fn) {
     if (typeof namespace !== 'string') {
       map = namespace;
       namespace = '';
-    } else if (namespace.charAt(namespace.length - 1) !== '/') {
+    }
+    else if (namespace.charAt(namespace.length - 1) !== '/') {
       namespace += '/';
     }
+
     return fn(namespace, map)
   }
 }
@@ -1027,4 +1027,13 @@ var index_esm = {
 };
 
 export default index_esm;
-export { Store, install, mapState, mapMutations, mapGetters, mapActions, createNamespacedHelpers };
+
+export {
+  Store, // store构造函数
+  install,  // vue use install函数
+  mapState,
+  mapMutations,
+  mapGetters,
+  mapActions,
+  createNamespacedHelpers
+};
