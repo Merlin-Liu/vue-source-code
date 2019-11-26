@@ -342,7 +342,7 @@ var Store = function Store (options) {
   // initialize the store vm, which is responsible for the reactivity
   // (also registers _wrappedGetters as computed properties)
   console.error('构造Vuex的store实例')
-  resetStoreVM(this, state);
+  resetStoreVM(this, state); // 建立getters和state的联系
   console.error('构造Vuex的store实例结束')
 
   // apply plugins
@@ -370,49 +370,46 @@ prototypeAccessors$1.state.set = function (v) {
 };
 
 Store.prototype.commit = function commit (_type, _payload, _options) {
-    var this$1 = this;
+  console.log('触发了一个commit，type：' + _type)
+  var this$1 = this;
 
-  // check object-style commit
-  var ref = unifyObjectStyle(_type, _payload, _options);
-    var type = ref.type;
-    var payload = ref.payload;
-    var options = ref.options;
+  // commit支持载荷方式和对象方式进行分发
+  // e.g. store.commit('typeOne', { a: 1, b: 2 }) 荷载方式
+  //      store.commit({ type: 'typeOne', a: 1, b: 2 }) 对象方式
+  var { type, payload, options } = unifyObjectStyle(_type, _payload, _options);
 
-  var mutation = { type: type, payload: payload };
+  var mutation = { type, payload };
   var entry = this._mutations[type];
+
+  // 未匹配到commit type对应的mutation
   if (!entry) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(("[vuex] unknown mutation type: " + type));
-    }
+    (process.env.NODE_ENV !== 'production') && console.error("[vuex] unknown mutation type: " + type);
     return
   }
+
   this._withCommit(function () {
-    entry.forEach(function commitIterator (handler) {
+    // 触发commit type对应的所有mutation
+    entry.forEach(handler => {
       handler(payload);
     });
   });
-  this._subscribers.forEach(function (sub) { return sub(mutation, this$1.state); });
 
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    options && options.silent
-  ) {
-    console.warn(
-      "[vuex] mutation type: " + type + ". Silent option has been removed. " +
-      'Use the filter functionality in the vue-devtools'
-    );
+  this._subscribers.forEach(function (sub) {
+    return sub(mutation, this$1.state);
+  });
+
+  if (process.env.NODE_ENV !== 'production' && options && options.silent) {
+    console.warn("[vuex] mutation type: " + type + ". Silent option has been removed. Use the filter functionality in the vue-devtools");
   }
 };
 
 Store.prototype.dispatch = function dispatch (_type, _payload) {
-    var this$1 = this;
+  var this$1 = this;
 
-  // check object-style dispatch
-  var ref = unifyObjectStyle(_type, _payload);
-    var type = ref.type;
-    var payload = ref.payload;
+  // dispatch支持载荷方式和对象方式进行分，同commit
+  var { type, payload } = unifyObjectStyle(_type, _payload);
 
-  var action = { type: type, payload: payload };
+  var action = { type, payload };
   var entry = this._actions[type];
   if (!entry) {
     if (process.env.NODE_ENV !== 'production') {
@@ -423,8 +420,12 @@ Store.prototype.dispatch = function dispatch (_type, _payload) {
 
   try {
     this._actionSubscribers
-      .filter(function (sub) { return sub.before; })
-      .forEach(function (sub) { return sub.before(action, this$1.state); });
+      .filter(function (sub) {
+        return sub.before;
+      })
+      .forEach(function (sub) {
+        return sub.before(action, this$1.state);
+      });
   } catch (e) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn("[vuex] error in before action subscribers: ");
@@ -548,6 +549,8 @@ function resetStore (store, hot) {
   resetStoreVM(store, state, hot);
 }
 
+// vuex从设计上，getter就依赖了state，并且getter的值可以被缓存，只有getter所依赖的值变化了，getter才会被重新计算
+// 所以，这是典型的vue计算属性
 function resetStoreVM (store, state, hot) {
   var oldVm = store._vm;
 
@@ -559,9 +562,14 @@ function resetStoreVM (store, state, hot) {
     // use computed to leverage its lazy-caching mechanism
     // direct inline function use will lead to closure preserving oldVm.
     // using partial to return function with only arguments preserved in closure enviroment.
-    computed[key] = partial(fn, store);
+    computed[key] = partial(fn, store); // 这里返回的就是store的每一个getter
+
+    // 定义store.getters的代理，访问store.getters.a就是访问store._vm.a，也是就是访问store._vm的计算属性a
     Object.defineProperty(store.getters, key, {
-      get: function () { return store._vm[key]; },
+      get: function () {
+        return store._vm[key];
+      },
+
       enumerable: true // for local getters
     });
   });
@@ -571,15 +579,19 @@ function resetStoreVM (store, state, hot) {
   // some funky global mixins
   var silent = Vue.config.silent;
   Vue.config.silent = true;
+
+  // 创建store下的vue实例
   store._vm = new Vue({
     data: {
-      $$state: state
+      $$state: state // 观察state，因为只有观察了state，计算属性才会收集对state的依赖，并且在state发生变化时更新相应的依赖
     },
-    computed: computed
+
+    computed: computed // 定义计算属性
   });
   Vue.config.silent = silent;
 
-  // enable strict mode for new vm
+  // 严格模式，在严格模式下，无论何时发生了状态变更且不是由mutation函数引起的，将会抛出错误。这能保证所有的状态变更都能被调试工具跟踪到
+  // 不要在发布环境下启用严格模式！严格模式会深度监测状态树来检测不合规的状态变更——请确保在发布环境下关闭严格模式，以避免性能损失。
   if (store.strict) {
     enableStrictMode(store);
   }
@@ -602,7 +614,6 @@ function resetStoreVM (store, state, hot) {
 function installModule (store, rootState, path, module, hot) {
   var isRoot = !path.length;
   var namespace = store._modules.getNamespace(path);
-  console.log(installModule)
 
   // register in namespace map
   if (module.namespaced) {
@@ -737,6 +748,7 @@ function registerMutation (store, type, handler, local) {
 function registerAction (store, type, handler, local) {
   var entry = store._actions[type] || (store._actions[type] = []);
   entry.push(function wrappedActionHandler (payload, cb) {
+    console.error(payload, cb)
     var res = handler.call(store, {
       dispatch: local.dispatch,
       commit: local.commit,
@@ -748,12 +760,14 @@ function registerAction (store, type, handler, local) {
     if (!isPromise(res)) {
       res = Promise.resolve(res);
     }
+
     if (store._devtoolHook) {
       return res.catch(function (err) {
         store._devtoolHook.emit('vuex:error', err);
         throw err
       })
-    } else {
+    }
+    else {
       return res
     }
   });
@@ -761,11 +775,11 @@ function registerAction (store, type, handler, local) {
 
 function registerGetter (store, type, rawGetter, local) {
   if (store._wrappedGetters[type]) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(("[vuex] duplicate getter key: " + type));
-    }
+    // 重复的getter被注册
+    (process.env.NODE_ENV !== 'production') && console.error(("[vuex] duplicate getter key: " + type));
     return
   }
+
   store._wrappedGetters[type] = function wrappedGetter (store) {
     return rawGetter(
       local.state, // local state
@@ -801,7 +815,7 @@ function unifyObjectStyle (type, payload, options) {
     assert(typeof type === 'string', ("expects string as the type, but found " + (typeof type) + "."));
   }
 
-  return { type: type, payload: payload, options: options }
+  return { type, payload, options }
 }
 
 function install (_Vue) {

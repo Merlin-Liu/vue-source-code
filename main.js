@@ -79,7 +79,11 @@ const store = new Vuex.Store({
       state.count.countB++
     }
   },
-  strict: 1
+  strict: 1,
+  getters: {
+    a: s => s.count.countA,
+    b: s => s.count.countB
+  }
 })
 
 
@@ -319,7 +323,7 @@ const rootVm = new Vue({
           }
         }
       },
-      this.$store.state.count.countA),
+      this.$store.getters.a),
 
       h('button', {
         on: {
@@ -328,7 +332,7 @@ const rootVm = new Vue({
           }
         }
       },
-      this.$store.state.count.countB)
+      this.$store.getters.b)
     ])
   },
 
