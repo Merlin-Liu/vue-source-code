@@ -19,7 +19,7 @@ import store from './vuex-test'
 // } from './component-test'
 
 // vue其他静态方法例子
-import './vue-util-test'
+// import './vue-util-test'
 
 // rootVm
 /* ------------------------------------------------------------------------------------------------ */
@@ -35,7 +35,7 @@ const rootVm = new Vue({
           }
         }
       },
-      this.$store.getters.b),
+      this.$store.state.count.countA),
 
       h('button', {
         on: {
@@ -44,13 +44,13 @@ const rootVm = new Vue({
           }
         }
       },
-      this.$store.getters.b)
+      this.$store.state.count.countB)
     ])
   },
 
   props: null,
 
-  data: null,
+  data: {},
 
   filters: null,
 

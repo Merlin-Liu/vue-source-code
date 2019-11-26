@@ -20,11 +20,13 @@ export default new Vuex.Store({
     },
 
     incrementB (state) {
+      console.warn(111111)
       state.count.countB++
+      console.warn(111111)
     }
   },
   actions: {
-    addA(store, a, b) {
+    addA(store) {
       store.commit('incrementA')
     },
 
@@ -32,9 +34,9 @@ export default new Vuex.Store({
       store.commit('incrementB')
     }
   },
-  strict: 1,
-  getters: {
-    a: s => s.count.countA,
-    b: s => s.count.countB
-  }
+  strict: true,
+  // getters: {
+  //   a: s => s.count.countA,
+  //   b: s => s.count.countB
+  // }
 })

@@ -8,7 +8,9 @@ function applyMixin (Vue) {
   var version = Number(Vue.version.split('.')[0]);
 
   if (version >= 2) {
-    Vue.mixin({ beforeCreate: vuexInit });
+    Vue.mixin({
+      beforeCreate: vuexInit
+    });
   }
   // 兼容1.x版本
   else {
@@ -27,6 +29,7 @@ function applyMixin (Vue) {
     if (options.store) {
       this.$store = typeof options.store === 'function' ? options.store() : options.store;
     }
+    // 将自身实例的$store指向父实例的$store，依次向上级寻找
     else if (options.parent && options.parent.$store) {
       this.$store = options.parent.$store;
     }
@@ -36,8 +39,11 @@ function applyMixin (Vue) {
 var target = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined' ? global : {});
 var devtoolHook = target.__VUE_DEVTOOLS_GLOBAL_HOOK__;
 
+// 插件
 function devtoolPlugin (store) {
-  if (!devtoolHook) { return }
+  if (!devtoolHook) {
+    return
+  }
 
   store._devtoolHook = devtoolHook;
 
@@ -76,6 +82,7 @@ function partial (fn, arg) {
   }
 }
 
+// ------------------------------ Module Constructor ------------------------------
 // Base data struct for store's module, package with some attribute and method
 var Module = function Module (rawModule, runtime) {
   this.runtime = runtime;
@@ -143,7 +150,10 @@ Module.prototype.forEachMutation = function forEachMutation (fn) {
 };
 
 Object.defineProperties( Module.prototype, prototypeAccessors );
+// ------------------------------------------------------------------------------
 
+
+// ------------------------ ModuleCollection Constructor ------------------------
 var ModuleCollection = function ModuleCollection (rawRootModule) {
   // register root module (Vuex.Store options)
   this.register([], rawRootModule, false);
@@ -201,6 +211,7 @@ ModuleCollection.prototype.unregister = function unregister (path) {
 
   parent.removeChild(key);
 };
+// ------------------------------------------------------------------------------
 
 function update (path, targetModule, newModule) {
   if (process.env.NODE_ENV !== 'production') {
@@ -276,6 +287,7 @@ function makeAssertionMessage (path, key, type, value, expected) {
 
 var Vue; // bind on install
 
+// ------------------------ Store Constructor ------------------------
 var Store = function Store (options) {
   var this$1 = this;
   if (options === void 0) options = {};
@@ -293,14 +305,15 @@ var Store = function Store (options) {
     assert(this instanceof Store, "store must be called with the new operator.");
   }
 
-  // plugin
+  // 插件
   var plugins = options.plugins;
-  if (plugins === void 0) {
+  if (plugins === undefined) {
     plugins = []
   };
+
   // 严格模式
   var strict = options.strict;
-  if (strict === void 0){
+  if (strict === undefined){
     strict = false;
   }
 
@@ -452,10 +465,12 @@ Store.prototype.dispatch = function dispatch (_type, _payload) {
   })
 };
 
+// 订阅 store 的 mutation。handler 会在每个 mutation 完成后调用，接收 mutation 和经过 mutation 后的状态作为参数
 Store.prototype.subscribe = function subscribe (fn) {
   return genericSubscribe(fn, this._subscribers)
 };
 
+// 订阅 store 的 action。handler 会在每个 action 分发的时候调用并接收 action 描述和当前的 store 的 state 这两个参数
 Store.prototype.subscribeAction = function subscribeAction (fn) {
   var subs = typeof fn === 'function' ? { before: fn } : fn;
   return genericSubscribe(subs, this._actionSubscribers)
@@ -524,6 +539,7 @@ Store.prototype._withCommit = function _withCommit (fn) {
 };
 
 Object.defineProperties( Store.prototype, prototypeAccessors$1 );
+// -------------------------------------------------------------------
 
 function genericSubscribe (fn, subs) {
   if (subs.indexOf(fn) < 0) {
@@ -819,12 +835,12 @@ function unifyObjectStyle (type, payload, options) {
 }
 
 function install (_Vue) {
+  // 已经安装过vuex了
   if (Vue && _Vue === Vue) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('[vuex] already installed. Vue.use(Vuex) should be called only once.');
-    }
+    (process.env.NODE_ENV !== 'production') && console.error('[vuex] already installed. Vue.use(Vuex) should be called only once.');
     return
   }
+
   Vue = _Vue;
   applyMixin(Vue);
 }
@@ -961,6 +977,7 @@ var mapActions = normalizeNamespace(function (namespace, actions) {
  * @param {String} namespace
  * @return {Object}
  */
+// 创建基于命名空间的组件绑定辅助函数。其返回一个包含 mapState、mapGetters、mapActions 和 mapMutations 的对象。它们都已经绑定在了给定的命名空间上
 var createNamespacedHelpers = function (namespace) { return ({
   mapState: mapState.bind(null, namespace),
   mapGetters: mapGetters.bind(null, namespace),
