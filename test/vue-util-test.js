@@ -1,3 +1,6 @@
+// 拷贝的vue源码，即./node_modules/vue/dist/vue.esm.js
+import Vue from '../vue'
+
 const childVue = Vue.extend({
   template: '<p>{{firstName}} {{lastName}} aka {{alias}} {{text}}</p>',
   data() {
