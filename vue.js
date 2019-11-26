@@ -1021,6 +1021,7 @@ function defineReactive (obj, key, val, customSetter, shallow) {
     },
 
     set: function reactiveSetter (newVal) {
+      console.log(`触发了【${key}】的setter`)
       var value = getter ? getter.call(obj) : val;
 
       if (newVal === value || (newVal !== newVal && value !== value)) {

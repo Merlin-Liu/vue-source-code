@@ -21,7 +21,7 @@ export default new Vuex.Store({
 
     incrementB (state) {
       console.warn(111111)
-      state.count.countB++
+      state.count.countB = 3
       console.warn(111111)
     }
   },
@@ -34,7 +34,7 @@ export default new Vuex.Store({
       store.commit('incrementB')
     }
   },
-  strict: true,
+  // strict: true, // 🔥注意，注意官网文档描述
   // getters: {
   //   a: s => s.count.countA,
   //   b: s => s.count.countB
