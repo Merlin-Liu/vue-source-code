@@ -86,17 +86,20 @@ function partial (fn, arg) {
 // Base data struct for store's module, package with some attribute and method
 var Module = function Module (rawModule, runtime) {
   this.runtime = runtime;
-  // Store some children item
-  this._children = Object.create(null);
-  // Store the origin module object which passed by programmer
-  this._rawModule = rawModule;
-  var rawState = rawModule.state;
+  this._children = Object.create(null); // module的childModule
+  this._rawModule = rawModule; // module的配置 e.g. { namespaced: true, actions..., modules: ... }
+  var rawState = rawModule.state; // module的配置的state
 
-  // Store the origin module's state
+  // 当前模块（module）的state
+  // 如果你传入返回一个对象的函数，其返回的对象会被用作state。这在你想要重用state对象，尤其是对于重用module来说非常有用
   this.state = (typeof rawState === 'function' ? rawState() : rawState) || {};
 };
 
-var prototypeAccessors = { namespaced: { configurable: true } };
+var prototypeAccessors = {
+  namespaced: {
+    configurable: true
+  }
+};
 
 prototypeAccessors.namespaced.get = function () {
   return !!this._rawModule.namespaced
@@ -179,25 +182,25 @@ ModuleCollection.prototype.update = function update$1 (rawRootModule) {
 
 ModuleCollection.prototype.register = function register (path, rawModule, runtime) {
   var this$1 = this;
-  if (runtime === void 0) runtime = true;
+  if (runtime === undefined) runtime = true;
 
-  if (process.env.NODE_ENV !== 'production') {
-    assertRawModule(path, rawModule);
-  }
+  (process.env.NODE_ENV !== 'production') && assertRawModule(path, rawModule);
 
+  // 创建module对象
   var newModule = new Module(rawModule, runtime);
+
+  // 如果当前path的长度为0，证明是个根模块
   if (path.length === 0) {
-    // 注册root module
     this.root = newModule;
   }
+  // 否则就需要建立模块之间的父子关系
   else {
     var parent = this.get(path.slice(0, -1));
     parent.addChild(path[path.length - 1], newModule);
   }
 
-  // register nested modules
+  // 注册嵌套的modules
   if (rawModule.modules) {
-    // 注册其他modules
     forEachValue(rawModule.modules, function (rawChildModule, key) {
       this$1.register(path.concat(key), rawChildModule, runtime);
     });
@@ -323,7 +326,10 @@ var Store = function Store (options) {
   this._actionSubscribers = [];
   this._mutations = Object.create(null);
   this._wrappedGetters = Object.create(null);
+
+  // 1、初始化模块
   this._modules = new ModuleCollection(options); // 字面意思：模块集合
+
   this._modulesNamespaceMap = Object.create(null);
   this._subscribers = [];
   console.error('构造Vuex的watcher实例')
@@ -350,11 +356,13 @@ var Store = function Store (options) {
   // init root module.
   // this also recursively registers all sub-modules
   // and collects all module getters inside this._wrappedGetters
-  installModule(this, state, [], this._modules.root);
+  // 2、安装模块
+  installModule(this, state, [], this._modules.root); // 参数对应为 store、rootState、path、module
 
   // initialize the store vm, which is responsible for the reactivity
   // (also registers _wrappedGetters as computed properties)
   console.error('构造Vuex的store实例')
+  // 3、初始化Store的vm
   resetStoreVM(this, state); // 监听state的变化、建立getters和state的联系
   console.error('构造Vuex的store实例结束')
 
@@ -636,7 +644,7 @@ function installModule (store, rootState, path, module, hot) {
   var isRoot = !path.length;
   var namespace = store._modules.getNamespace(path);
 
-  // register in namespace map
+  // namespace 对应的模块保存下来，为了方便以后能根据namespace查找模块
   if (module.namespaced) {
     store._modulesNamespaceMap[namespace] = module;
   }
@@ -682,14 +690,13 @@ function makeLocalContext (store, namespace, path) {
 
   var local = {
     // 没有命名空间，直接指向root store的dispatch
+    // 对于存在命名空间的，把 type自动拼接上namespace，然后执行root store上对应的dispatch
     dispatch: noNamespace ? store.dispatch : function (_type, _payload, _options) {
-      var args = unifyObjectStyle(_type, _payload, _options);
-      var payload = args.payload;
-      var options = args.options;
-      var type = args.type;
+      var { payload, options, type } = unifyObjectStyle(_type, _payload, _options);
 
       if (!options || !options.root) {
         type = namespace + type;
+
         if (process.env.NODE_ENV !== 'production' && !store._actions[type]) {
           console.error(("[vuex] unknown local action type: " + (args.type) + ", global type: " + type));
           return
@@ -701,13 +708,11 @@ function makeLocalContext (store, namespace, path) {
 
     // 没有命名空间，直接指向root store的commit
     commit: noNamespace ? store.commit : function (_type, _payload, _options) {
-      var args = unifyObjectStyle(_type, _payload, _options);
-      var payload = args.payload;
-      var options = args.options;
-      var type = args.type;
+      var { payload, options, type } = unifyObjectStyle(_type, _payload, _options);
 
       if (!options || !options.root) {
         type = namespace + type;
+
         if (process.env.NODE_ENV !== 'production' && !store._mutations[type]) {
           console.error(("[vuex] unknown local mutation type: " + (args.type) + ", global type: " + type));
           return

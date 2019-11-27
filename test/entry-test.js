@@ -31,20 +31,69 @@ const rootVm = new Vue({
       h('button', {
         on: {
           click: () => {
-            this.$store.commit('incrementA')
+            this.$store.dispatch('a/addA')
           }
         }
       },
-      this.$store.state.count.countA),
+      this.$store.state.a.countA),
+
+      h('button', {
+        style: {
+          marginLeft: '10px'
+        },
+        on: {
+          click: () => {
+            this.$store.dispatch('a/addB')
+          }
+        }
+      },
+      this.$store.state.a.countB),
+
+      h('hr'),
 
       h('button', {
         on: {
           click: () => {
-            this.$store.commit('incrementB')
+            this.$store.dispatch('b/addA')
           }
         }
       },
-      this.$store.state.count.countB)
+      this.$store.state.b.countA),
+
+      h('button', {
+        style: {
+          marginLeft: '10px'
+        },
+        on: {
+          click: () => {
+            this.$store.dispatch('b/addB')
+          }
+        }
+      },
+      this.$store.state.b.countB),
+
+      h('hr'),
+
+      h('button', {
+        on: {
+          click: () => {
+            this.$store.dispatch('b/bChild/addA')
+          }
+        }
+      },
+      this.$store.state.b.bChild.countA),
+
+      h('button', {
+        style: {
+          marginLeft: '10px'
+        },
+        on: {
+          click: () => {
+            this.$store.dispatch('b/bChild/addB')
+          }
+        }
+      },
+      this.$store.state.b.bChild.countB),
     ])
   },
 

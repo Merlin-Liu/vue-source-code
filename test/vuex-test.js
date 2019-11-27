@@ -6,33 +6,97 @@ import Vuex from '../vuex'
 
 Vue.use(Vuex)
 
-// vuex实例
-export default new Vuex.Store({
+const moduleA = {
+  namespaced: true,
+
   state: {
-    count: {
-      countA: 0,
-      countB: 0
-    }
+    countA: 0,
+    countB: 0
   },
 
   mutations: {
     incrementA (state) {
-      state.count.countA++
+      state.countA++
     },
-
     incrementB (state) {
-      state.count.countB++
+      state.countB++
     }
   },
 
   actions: {
-    addA(store) {
-      store.commit('incrementA')
+    addA ({commit}) {
+      commit('incrementA')
     },
-
-    addB(store) {
-      store.commit('incrementB')
+    addB ({commit}) {
+      commit('incrementB')
     }
+  }
+}
+
+const moduleBchild = {
+  namespaced: true,
+
+  state: {
+    countA: 0,
+    countB: 0
+  },
+
+  mutations: {
+    incrementA (state) {
+      state.countA++
+    },
+    incrementB (state) {
+      state.countB++
+    }
+  },
+
+  actions: {
+    addA ({commit}) {
+      commit('incrementA')
+    },
+    addB ({commit}) {
+      commit('incrementB')
+    }
+  }
+}
+
+const moduleB = {
+  namespaced: true,
+
+  state: {
+    countA: 0,
+    countB: 0
+  },
+
+  mutations: {
+    incrementA (state) {
+      state.countA++
+    },
+    incrementB (state) {
+      state.countB++
+    }
+  },
+
+  actions: {
+    addA ({commit}) {
+      commit('incrementA')
+    },
+    addB ({commit}) {
+      commit('incrementB')
+    }
+  },
+
+  // 嵌套模块
+  modules: {
+    bChild: moduleBchild
+  }
+}
+
+// vuex实例
+export default new Vuex.Store({
+  modules: {
+    a: moduleA,
+    b: moduleB
   },
 
   // strict: true, // 🔥注意，注意官网文档描述
