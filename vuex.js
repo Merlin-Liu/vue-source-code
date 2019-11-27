@@ -156,9 +156,9 @@ Object.defineProperties( Module.prototype, prototypeAccessors );
 // ------------------------------------------------------------------------------
 
 
-// ------------------------ ModuleCollection Constructor ------------------------
+// ------------------------ ModuleCollection 构造函数 ------------------------
 var ModuleCollection = function ModuleCollection (rawRootModule) {
-  // register root module (Vuex.Store options)
+  // 注册根模块
   this.register([], rawRootModule, false);
 };
 
@@ -620,7 +620,7 @@ function resetStoreVM (store, state, hot) {
   Vue.config.silent = silent;
 
   // 严格模式，在严格模式下，无论何时发生了状态变更且不是由mutation函数引起的，将会抛出错误。这能保证所有的状态变更都能被调试工具跟踪到
-  // 不要在发布环境下启用严格模式！严格模式会深度监测状态树来检测不合规的状态变更——请确保在发布环境下关闭严格模式，以避免性能损失。
+  // 不要在发布环境下启用严格模式！严格模式会深度监测状态树来检测不合规的状态变更——请确保在发布环境下关闭严格模式，以避免性能损失
   if (store.strict) {
     enableStrictMode(store);
   }
@@ -649,7 +649,7 @@ function installModule (store, rootState, path, module, hot) {
     store._modulesNamespaceMap[namespace] = module;
   }
 
-  // set state
+  // 将子模块的state挂载到父模块的state上
   if (!isRoot && !hot) {
     var parentState = getNestedState(rootState, path.slice(0, -1));
     var moduleName = path[path.length - 1];
@@ -707,6 +707,7 @@ function makeLocalContext (store, namespace, path) {
     },
 
     // 没有命名空间，直接指向root store的commit
+    // 对于存在命名空间的，把 type自动拼接上namespace，然后执行root store上对应的commit
     commit: noNamespace ? store.commit : function (_type, _payload, _options) {
       var { payload, options, type } = unifyObjectStyle(_type, _payload, _options);
 
@@ -825,9 +826,7 @@ function enableStrictMode (store) {
 }
 
 function getNestedState (state, path) {
-  return path.length
-    ? path.reduce(function (state, key) { return state[key]; }, state)
-    : state
+  return path.length ? path.reduce((state, key) => state[key], state) : state
 }
 
 function unifyObjectStyle (type, payload, options) {
