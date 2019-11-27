@@ -355,28 +355,32 @@ var Store = function Store (options) {
   // initialize the store vm, which is responsible for the reactivity
   // (also registers _wrappedGetters as computed properties)
   console.error('构造Vuex的store实例')
-  resetStoreVM(this, state); // 建立getters和state的联系
+  resetStoreVM(this, state); // 监听state的变化、建立getters和state的联系
   console.error('构造Vuex的store实例结束')
 
-  // apply plugins
+  // 应用插件
   plugins.forEach(function (plugin) {
     return plugin(this$1);
   });
 
   // devtools
   var useDevtools = options.devtools !== undefined ? options.devtools : Vue.config.devtools;
-  if (useDevtools) {
-    devtoolPlugin(this);
+  useDevtools && devtoolPlugin(this);
+};
+
+var prototypeAccessors$1 = {
+  state: {
+    configurable: true
   }
 };
 
-var prototypeAccessors$1 = { state: { configurable: true } };
-
 prototypeAccessors$1.state.get = function () {
+  // 将获取this.$store.state.a代理到this.$store._vm._data.a
   return this._vm._data.$$state
 };
 
 prototypeAccessors$1.state.set = function (v) {
+  // 不能通过直接操作state改变state的数据
   if (process.env.NODE_ENV !== 'production') {
     assert(false, "use store.replaceState() to explicit replace store state.");
   }
@@ -538,7 +542,8 @@ Store.prototype._withCommit = function _withCommit (fn) {
   this._committing = committing;
 };
 
-Object.defineProperties( Store.prototype, prototypeAccessors$1 );
+// 定义Store的原型，就是定义了store.state的getter和setter
+Object.defineProperties(Store.prototype, prototypeAccessors$1);
 // -------------------------------------------------------------------
 
 function genericSubscribe (fn, subs) {

@@ -14,17 +14,17 @@ export default new Vuex.Store({
       countB: 0
     }
   },
+
   mutations: {
     incrementA (state) {
       state.count.countA++
     },
 
     incrementB (state) {
-      console.warn(111111)
-      state.count.countB = 3
-      console.warn(111111)
+      state.count.countB++
     }
   },
+
   actions: {
     addA(store) {
       store.commit('incrementA')
@@ -34,9 +34,13 @@ export default new Vuex.Store({
       store.commit('incrementB')
     }
   },
+
   // strict: true, // 🔥注意，注意官网文档描述
+
   // getters: {
   //   a: s => s.count.countA,
   //   b: s => s.count.countB
-  // }
+  // },
+
+  devtools: false
 })
